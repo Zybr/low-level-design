@@ -1,0 +1,60 @@
+@startuml
+left to right direction
+
+(add sport)
+(add agent)
+(add entry)
+(add exit)
+(login/logout)
+(add/modify rate)
+(view account)
+(update account)
+
+(take ticket)
+(scan ticket)
+(pay ticket)
+(pay by cache)
+(pay by card)
+(park vehicle)
+
+(assign spot to vehicle)
+(take spot)
+(show full)
+(show available)
+
+(pay ticket) ..> (scan ticket)
+(pay ticket) <|-- (pay by cache)
+(pay ticket) <|-- (pay by card)
+
+:Customer:
+:Agent:
+:Admin:
+:System:
+Customer <|--- Agent
+
+Admin --> (add sport)
+Admin --> (add agent)
+Admin --> (add entry)
+Admin --> (add exit)
+Admin --> (login/logout)
+Admin --> (add/modify rate)
+Admin --> (view account)
+Admin --> (update account)
+
+Customer --> (take ticket)
+Customer --> (pay ticket)
+Customer --> (park vehicle)
+
+Agent --> (login/logout)
+Agent --> (view account)
+Agent --> (update account)
+'Agent --> (take ticket)
+'Agent --> (pay ticket)
+
+System --> (assign spot to vehicle)
+System --> (take spot)
+System --> (show full)
+System --> (show available)
+
+
+@enduml

@@ -1,0 +1,17 @@
+@startuml
+
+autonumber
+
+actor Customer
+participant ExitPanel
+participant Payment
+participant ParkingRate
+
+Customer -> ExitPanel++: scan
+ExitPanel -> Payment++: check status
+ExitPanel <-- Payment--: unpaid
+ExitPanel -> ParkingRate++: calculate fee
+ExitPanel <-- ParkingRate--: fee
+Customer <-- ExitPanel--: request payment
+
+@enduml

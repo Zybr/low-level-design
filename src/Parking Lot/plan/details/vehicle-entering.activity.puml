@@ -1,0 +1,29 @@
+@startuml
+
+start
+:customer enter;
+:system displays free sports;
+:system displays vehicles types;
+:user choose a vehicle types;
+switch (which is vehicle type?)
+case (Car)
+    if (is disabled person?) then (yes)
+        :allocate **handicapped** slot;
+    else (no)
+        :allocate **compact** slot;
+    endif
+case (Truck)
+    :allocate **large** slot;
+case (Van)
+    :allocate **large** slot;
+case (Motorcycle)
+    :allocate **moto** slot;
+endswitch
+if (is slot available?) then (yes)
+    :system prints the ticket;
+else (no)
+    :system denies access;
+endif
+stop
+
+@enduml

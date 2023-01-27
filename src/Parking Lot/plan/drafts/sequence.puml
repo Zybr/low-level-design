@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor Admin
+actor "Parking Agent"
+actor Person
+
+== Creations ==
+
+actor Admin
+
+Admin -> "Parking Lot": add entrance
+"Parking Lot" -> Entrance **
+Admin -> "Parking Lot": add exit
+"Parking Lot" -> Exit **
+Admin -> "Parking Lot": add display
+"Parking Lot" -> Display **
+
+== Enter ==
+
+Person -> Entrance: get ticket
+Activate Entrance
+Entrance -> Ticket **
+Entrance -> Vehicle: assign ticket
+Deactivate Entrance
+Person -> "Parking Spot": take
+"Parking Spot" -> Vehicle: assign
+
+== Exit ==
+
+Person -> Exit: process ticket
+Activate Exit
+Exit -> Exit: validate ticket
+Exit -> Payment **
+Exit -> Ticket !!
+Deactivate Exit
+
+"Parking Agent" -> "Exit": process ticket
+Exit ->? : ...
+
+@enduml

@@ -1,0 +1,163 @@
+@startuml
+left to right direction
+
+abstract class Vehicle {
+    - licenseNumber: string
+    + assignTicket(): void
+}
+
+class Car extends Vehicle{
+}
+
+class Truck extends Vehicle {
+}
+
+class Van extends Vehicle {
+}
+
+class Motorcycle extends Vehicle {
+}
+
+abstract class ParkingSpot {
+    - id: int
+    - isFree: bool
+    + getIsFree (): bool
+}
+
+class Compact extends ParkingSpot {
+}
+
+class Handicapped extends ParkingSpot {
+}
+
+class Large extends ParkingSpot {
+}
+
+class Moto extends ParkingSpot {
+}
+
+class Account {
+    - username: string
+    - password: string
+    - status: AccountStatus
+    - person: Person
+    + resetPassword(): void
+}
+
+class Admin extends Account {
+    + addParkingSpot (parkingSpot): bool
+    + addDisplayBoard (parkingSpot): bool
+    + addEntrance (entrance): bool
+    + addExit (exit): bool
+}
+
+class ParkingAgent extends Account {
+    + processTicket (): bool
+}
+
+class DisplayBoard {
+    + id: int
+    + compactSpot: Compact
+    + handicappedSpot: Handicapped
+    + largeSpot: Large
+    + motoSpot: Moto
+}
+
+class Entrance {
+    + getTicket (): Ticket
+}
+
+class Exit {
+    + validateTicket (ticket): void
+}
+
+class Ticket {
+    + id: int
+    + startTime: DateTime
+}
+
+class Payment {
+    + amount: double
+    + status: PaymentStatus
+    + time: DateTime
+    + calculate (): void
+}
+
+class Cash extends Payment {
+}
+
+class Card extends Payment {
+}
+
+class ParkingRate {
+    - hours: double
+    - rate: double
+    + calculate (): void
+}
+
+class ParkingLot {
+    + addEntrance (entrance): bool
+    + addExit (exit): bool
+    + addDisplayBoard (displayBoard): bool
+    + isFull (): bool
+}
+
+class Address {
+    + country: string
+    + state: string
+    + city: string
+    + address: string
+    + zipCode: int
+}
+
+class Person {
+    + name: string
+    + country: string
+    + state: string
+    + city: string
+    + address: string
+    + zipCode: string
+}
+
+enum AccountStatus {
+    Active
+    Close
+    Canceled
+    Blacklisted
+    None
+}
+
+enum PaymentStatus {
+    Completed
+    Unpaid
+    Pending
+    Failed
+    Refunded
+}
+
+Vehicle --> Ticket
+
+Account *--> AccountStatus
+'Account ..> ParkingLot
+
+ParkingLot *--> Entrance
+ParkingLot *--> Exit
+ParkingLot *--> DisplayBoard
+ParkingLot *--> ParkingSpot
+'ParkingLot *--> Address
+ParkingLot *--> Ticket
+ParkingLot *--> ParkingRate
+ParkingLot *--> Account
+
+ParkingSpot --> Vehicle
+
+Payment *--> PaymentStatus
+'Payments ..> ParkingRate
+Payment --> Ticket
+
+Entrance ..> Ticket
+Exit ..> Ticket
+
+Person --> Vehicle
+
+@enduml

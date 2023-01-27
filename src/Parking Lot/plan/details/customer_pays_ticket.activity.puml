@@ -1,0 +1,18 @@
+@startuml
+start
+:Customer arrives at the parking lot exit;
+:System scans the parking ticket;
+:System calculates and displays the parking rate;
+repeat: system asks for payment
+    fork
+        :Customer insert the credit card;
+        :Customer insert the pin;
+    fork again
+        :Customer pays cash;
+    end fork
+repeat while (Transaction is successful) is (no) not (yes)
+:System sends a success message;
+:System prints the receipt;
+:System opens the parking gate;
+stop
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+
+actor Customer
+participant Card
+participant CardReader
+participant Payment
+participant ExitPanel
+
+Customer -> CardReader++: insert card
+CardReader -> Payment**: initialise
+Payment -> Payment: process
+Destroy Payment
+CardReader <-- Payment: status
+CardReader --> Customer--: return card
+
+alt Successful payment
+    Customer -> ExitPanel: get receipt
+    Customer <-- ExitPanel: print receipt
+else Failed payment
+    Customer <-- ExitPanel: error message
+end
+
+@enduml
