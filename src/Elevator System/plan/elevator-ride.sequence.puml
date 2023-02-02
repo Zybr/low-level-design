@@ -1,0 +1,31 @@
+@startuml
+actor Passenger
+participant ElevatorButton
+participant ElevatorSystem
+participant ElevatorCar
+participant Door
+
+autonumber
+
+activate Passenger
+Passenger -> ElevatorButton: pressDown(floor)
+activate ElevatorButton
+ElevatorButton -> ElevatorSystem: destFloor(floor)
+activate ElevatorSystem
+ElevatorSystem -> Door: closeDoor()
+activate Door
+deactivate Door
+ElevatorSystem -> ElevatorCar: move(floor)
+activate ElevatorCar
+ElevatorCar --> ElevatorSystem: stop at floor
+deactivate ElevatorCar
+ElevatorSystem --> ElevatorButton: car arrived
+ElevatorButton --> Passenger: unpress
+deactivate ElevatorButton
+ElevatorSystem -> Door: openDoor()
+deactivate ElevatorSystem
+activate Door
+Door --> Passenger: door opens
+deactivate Door
+
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+:1. ;
+fork
+:2. Up direction;
+fork again
+:3. Down direction;
+fork end
+:4. Floors button light is turned on;
+:5. Screen shows approaching elevator cars current floor;
+:6. Elevator reaches passengers floor;
+:7. Floors button light is turned on;
+:8. The elevator door opens;
+:9. Passengers enters eht elevator;
+:10. The elevator door closes;
+stop
+
+@enduml

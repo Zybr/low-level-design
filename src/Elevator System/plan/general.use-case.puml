@@ -1,0 +1,35 @@
+@startuml
+
+left to right direction
+
+:Passenger:
+:System: #gray
+
+package Elevator {
+   (press elevator button) <|-- (floor request)
+   (press elevator button) <|-- (open/close door request)
+   (press elevator button) <|-- (call emergency)
+
+   (open/close door request) ..> (open/close door)
+   (floor request) ..> (move/stop elevator)
+
+   (press hall button) --> (request elevator)
+   (request elevator) <|-- (up)
+   (request elevator) <|-- (down)
+
+   (define elevator)
+   (move/stop elevator)
+   (open/close door)
+   (display) --> (inside)
+   (display) --> (outside)
+}
+
+Passenger --> (press elevator button)
+Passenger --> (press hall button)
+
+System --> (define elevator)
+System --> (display)
+System --> (open/close door)
+System --> (move/stop elevator)
+
+@enduml

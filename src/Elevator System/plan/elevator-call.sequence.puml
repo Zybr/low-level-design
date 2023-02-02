@@ -1,0 +1,28 @@
+@startuml
+actor Passenger
+participant HallButton
+participant ElevatorSystem
+participant Dispatcher
+participant ElevatorCar
+participant Door
+
+activate Passenger
+Passenger -> HallButton: press()
+activate HallButton
+HallButton -> HallButton
+HallButton -> ElevatorSystem: callElevator(floorNum)
+activate ElevatorSystem
+ElevatorSystem -> Dispatcher: selectCar()
+Dispatcher --> ElevatorSystem: car
+ElevatorSystem -> ElevatorCar: move(floorNum)
+ElevatorCar --> ElevatorSystem: stop at the floor
+ElevatorSystem --> HallButton: car arrived
+HallButton --> Passenger: unpress
+deactivate HallButton
+ElevatorSystem -> Door: open
+deactivate ElevatorSystem
+Door --> Passenger: door opens
+deactivate Passenger
+
+
+@enduml

@@ -1,0 +1,35 @@
+@startuml
+
+left to right direction
+
+actor System #silver
+actor Car #silver
+
+Customer --> (call car)
+Customer --> (come into car)
+Customer --> (choose floor)
+Customer --> (come out of car)
+Customer --> (request to open/close) #blue
+
+(call car) <|.. (call up)
+(call car) <|.. (call down)
+
+Car --> (move to floor)
+Car --> (stop)
+Car --> (show car state)
+Car --> (show weight load)
+
+(stop) ..> (open door)
+
+(move to floor) <|.. (move up)
+(move to floor) <|.. (move down)
+(move to floor) ..> (close door)
+
+(show car state) ..> (floor)
+(show car state) ..> (direction)
+
+System --> (show car state)
+System --> (choose car)
+(choose car) ..> (choose direction)
+
+@enduml

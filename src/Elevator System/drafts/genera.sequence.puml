@@ -1,0 +1,35 @@
+@startuml
+
+actor Passenger
+participant HallPanel
+participant System
+participant Car
+participant ElevatorPanel
+
+==Get Car==
+
+autonumber 1.1
+
+Passenger -> HallPanel: press up/down
+HallPanel -> System: request select Car
+loop not has IDLE car
+    System -> System: look for IDLE car
+end loop
+System -> System: choose closest IDLE car
+System -> Car: move to passenger floor
+System -> Car: open
+Car --> Passenger: get Car
+
+==Move==
+
+autonumber 2.1
+
+Passenger -> Car: come into
+Passenger -> ElevatorPanel: press floor number
+ElevatorPanel -> System: request moving to floor
+System -> Car: close
+System -> Car: move to target floor
+System -> Car: open
+Car --> Passenger: is on target floor
+
+@enduml

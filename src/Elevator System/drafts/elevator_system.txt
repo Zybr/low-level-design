@@ -1,0 +1,39 @@
+Models
+    Person
+    ElevatorSystem
+        - elevator: ElevatorCar
+        - floors: Floor[]
+        - calls: Call[]
+        + moveElevatorTo (floorNum)
+        + addCall (call)
+    Call
+        + floorNum: int
+        + direction: DIRECTION
+            UP
+            DOWN
+    Flor
+        + num: int
+        + panel: CallPanel
+            + getElevatorPosition()
+            + up ()
+            + down ()
+    ElevatorCar
+        + capacity: int
+        + people: Person[]
+        + florNumber: int
+        + upload (person): boolean
+        + unload (person)
+        + state: ElevatorState
+            STOP
+            MOVE_UP
+            MOVE_DOWN
+        + panel: ControlPanel
+            + setIsOverloaded (overloaded)
+            + isOverloaded () : boolean
+            + gotTo (floorNum)
+
+System
+    Building
+        Floor[]
+            Panel
+                Button[]

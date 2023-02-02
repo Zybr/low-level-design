@@ -1,0 +1,131 @@
+@startuml
+
+'left to right direction
+
+abstract class Button {
+    + pressed: bool
+    + isPressed
+    + press();
+}
+
+class ElevatorButton extends Button {
+    - dstFloorNum: number
+}
+
+class HallButton extends Button {
+    - scrFloorNum: number
+    - direction: Direction
+}
+HallButton o--> Direction
+
+enum Direction {
+    + UP
+    + DOWN
+}
+
+class HallPanel {
+    + upBtn: HallButton
+    + downBtn: HallButton
+}
+HallPanel *--> HallButton
+
+class ElevatorPanel {
+    + floorBtns: ElevatorButton []
+    + openBtn: ElevatorButton
+    + closeBtn: ElevatorButton
+}
+ElevatorPanel *--> ElevatorButton
+
+class Door {
+    - state: DoorState
+    + isOpen(): bool
+}
+Door *--> DoorState
+
+enum DoorState {
+    + OPEN
+    + CLOSE
+}
+
+abstract Display {
+    + showFloor()
+    + showDirection()
+}
+
+class HallDisplay extends Display {
+}
+
+class ElevatorDisplay extends Display {
+    - capacity: number
+    + showLoad()
+}
+
+class Floor {
+    - display: HallDisplay
+    - panel: HallPanel
+    + isTopMost(): bool
+    + isBottomMost(): bool
+}
+Floor *--> HallDisplay
+Floor *--> HallPanel
+
+class ElevatorCar {
+    - id: number
+    - state: ElevatorState
+    - display: ElevatorDisplay
+    - panel: ElevatorPanel
+    - door: Door
+    + open()
+    + close()
+    + move(floorNum)
+    + stop()
+    + unload(passenger)
+    + upload(passenger)
+}
+ElevatorCar *--> ElevatorState
+ElevatorCar *--> ElevatorDisplay
+ElevatorCar *--> ElevatorPanel
+ElevatorCar *--> Door
+ElevatorCar ..> Passenger: unload / upload
+note right of ElevatorCar::open
+? & close() - use panel
+end note
+note right of ElevatorCar::move
+? return promise to show longterm process
+end note
+
+enum ElevatorState {
+    + UP
+    + DOWN
+    + IDLE
+}
+
+class Building {
+    - floors: Floor[]
+    - elevators: ElevatorCar []
+}
+Building o--> Floor
+Building o--> ElevatorCar
+
+class ElevatorSystem {
+    - building: Building
+    + monitoring()
+    + callElevator(floorNum)
+}
+ElevatorSystem o--> Building
+ElevatorSystem ..> Dispatcher
+note right of ElevatorSystem::monitoring
+? update displays
+end note
+
+class Dispatcher {
+    - elevators: ElevatorCar
+    + selectCar(floorNum): ElevatorCar
+}
+Dispatcher o--> ElevatorCar
+
+class Passenger {
+    + weight: int;
+}
+
+@enduml

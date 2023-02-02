@@ -1,0 +1,84 @@
+@startuml
+class Passenger {
+    + weight
+}
+
+class Floor {
+    - num: int
+    + displays: HallDisplay []
+    + panel: HallPanel
+}
+
+enum Direction {
+    UP
+    DOWN
+}
+
+class HallPanel {
+    - floorNum: int
+    + requestUp ()
+    + requestDown ()
+}
+
+class HallDisplay {
+    + floor: int
+    + direction: Direction
+}
+
+class Elevator {
+    - car: Car
+    + display: CarDisplay
+    + panel: CarPanel
+    --
+    + moveTo  (floorNum: int)
+    + open ()
+    + close ()
+    ==weight==
+    + upload (passenger)
+    + unload (passenger)
+    + isOverloaded (): bool
+}
+
+class CarDisplay {
+    + isOverloaded: bool
+}
+
+class CarPanel {
+    + goToFloor (floor: int)
+    + openDoor ()
+    + closeDoor ()
+}
+
+class System {
+    - elevators: Elevator[]
+    - floors: Floor
+    --
+    + requestCar (floorNum, direction)
+    + requestOpen (elevatorId)
+    + requestClose (elevatorId)
+    ==factory==
+    + createFloor (): Floor
+    + createElevator (): Elevator
+}
+
+System "1" *--> "*" Elevator
+
+Elevator *--> CarDisplay
+Elevator *--> CarPanel
+
+
+Floor *--> HallPanel
+Floor "1" *--> "*" HallDisplay
+
+HallPanel ..> System: request car
+
+CarPanel ..> System: move \nopen \nclose
+
+HallDisplay --> Direction
+HallDisplay <|-- CarDisplay
+HallDisplay --> CarDisplay : get state
+
+Passenger ..> HallPanel
+Passenger ..> CarPanel
+
+@enduml

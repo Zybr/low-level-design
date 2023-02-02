@@ -1,0 +1,28 @@
+@startuml
+start
+:passenger requests for elevator;
+fork
+    :up button;
+fork again
+    :down button;
+end fork
+if (weight limit is at maximum) then (no)
+    :passenger enters in the car;
+    :passenger requests desired floor;
+    if (there are other requests?) then (yes)
+        if (same direction) then (yes)
+            :move to other requested floor;
+        else (no)
+            :ignore;
+        endif
+    else (no)
+        :move to passenger's desired floor;
+    endif
+else (yes)
+   :passenger is NOT allowed to enter;
+   stop
+endif
+:elevator reaches passenger's desired floor;
+stop
+
+@enduml
