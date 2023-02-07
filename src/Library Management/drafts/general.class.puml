@@ -1,0 +1,117 @@
+@startuml
+class Author {
+    + firstName
+    + lastName
+}
+
+class Book {
+    + isbn
+    + author
+    + title
+    + subject
+    + publication_date
+}
+Book o--> Author
+Book "1" o--> "*" BookItem
+
+class BookItem {
+    + id
+    + rack_number
+}
+
+class CardLog {
+    + card
+    + action
+    + date_time
+}
+CardLog *--> Card
+
+enum BookAction {
+    + RESERVE
+    + CANCEL_RESERVATION
+}
+
+class BookLog extends CardLog {
+    + book
+}
+BookLog *--> BookAction
+
+enum ItemAction {
+    + RECEIVE
+    + RENEW
+    + RETURN
+}
+
+class ItemLog extends CardLog {
+    + bookItem
+}
+ItemLog *--> ItemAction
+
+abstract class Account {
+    - login
+    - password
+    + resetPassword (old, new)
+}
+
+class LogList {
+    + logs: Log[]
+}
+LogList *--> CardLog
+
+class Member extends Account {
+}
+Member <--> Card
+
+class Librarian extends Account {
+}
+
+class Card {
+    + member
+}
+
+class Catalog {
+    - books
+    + addItem (bookItem)
+    + removeItem (bookItem)
+    + editBook (book, update)
+
+    + getBookByAuthor (author): Book[]
+    + getBookByDate (date): Book[]
+    + getBookByTitle (title): Book[]
+    + getBookBySubject (subject): Book[]
+}
+Catalog o--> Book
+Catalog ..> Author
+
+class Payment {
+    + amount
+}
+
+class System {
+    - accounts: Account[]
+    + catalog: Catalog
+    + logList: LogList
+    + registerLibrarian (login, password): Librarian
+    + cancelLibrarian (librarian)
+    + registerMember (login, password): Card
+    + cancelMember (card)
+    + login (login, password): Account
+    + logout (account)
+
+    + reserveBook (card, book)
+    + cancelReservation (card, book)
+    + issueBook (card, book): BookItem
+    + renewBook (item)
+    + returnBook (item): ?Payment
+
+    + notifyOfOverdue ()
+    + notifyOfFreeReservation ()
+    + notifyOfCanceledReservation ()
+}
+System *--> Catalog
+System *--> Account
+System *--> LogList
+System ..> Card
+System ..> Payment
+
+@enduml

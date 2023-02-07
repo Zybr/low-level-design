@@ -1,0 +1,61 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+
+actor Librarian #blue
+actor Member #orange
+actor System #gray
+
+'package Library {
+    Member --> (Search catalog) #orange
+    Member --> (Cancel membership) #orange
+    Member --> (Register/Update account) #orange
+    Member --> (Login/Logout) #orange
+    Member --> (Checkout book) #orange
+    Member --> (Remove reservation) #orange
+    Member --> (Renew book) #orange
+    Member --> (Reserve book) #orange
+    Member --> (View account) #orange
+    Member --> (Return book) #orange
+
+    (Add book) <-- Librarian #blue
+    (Remove book) <-- Librarian #blue
+    (Edit book) <-- Librarian #blue
+    (Register new account) <-- Librarian #blue
+    (Cancel membership) <-- Librarian #blue
+    (Register/Update account) <-- Librarian #blue
+    (Login/Logout) <-- Librarian #blue
+    (Issue book) <-- Librarian #blue
+    (Remove reservation) <-- Librarian #blue
+    (Renew book) <-- Librarian #blue
+    (Reserve book) <-- Librarian #blue
+    (View account) <-- Librarian #blue
+    (Search catalog) <-- Librarian #blue
+
+
+    (Overdue notification) <-- System #gray
+    (Reservation available notification) <-- System #gray
+    (Reservation canceled notification) <-- System #gray
+
+    (Search catalog) <|-- (By author name)
+    (Search catalog) <|-- (By publication date)
+    (Search catalog) <|-- (By book title)
+    (Search catalog) <|-- (By subject name)
+
+    (Add book) ..> (Add book item)
+    (Edit book) ..> (Edit book item)
+    (Remove book) ..> (Remove book item)
+
+    (Add book item) ..> (Update catalog)
+    (Edit book item) ..> (Update catalog)
+    (Remove book item) ..> (Update catalog)
+
+    (Issue book) ..> (Checkout book)
+
+    (Checkout book) ..> (Remove reservation)
+
+    (Register new account) <|-- (Issue library card)
+    (Return book) <|-- (Pay fine)
+'}
+
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+left to right direction
+
+Member --> (reserve book)
+(reserve book) ..> (add reservation)
+Member --> (take book)
+(take book) ..> (log taken book)
+Member --> (renew book)
+(renew book) ..> (log renew)
+Member --> (return book)
+(return book) ..> (log returned book)
+Member --> (search book)
+
+Librarian --> (search book)
+(search book) ..> (by title)
+(search book) ..> (by author)
+(search book) ..> (by subject)
+(search book) ..> (by date)
+
+System --> (send debt notification)
+(send debt notification)
+
+@enduml

@@ -1,0 +1,48 @@
+Roles
+    Member
+    Librarian
+    System
+
+Conditions
+    Member can reserve (event reserved) book
+    Librarian receives notification of not returned book
+    Book has copies (items)
+    Limit is 10 books for 15 days per 1 member
+
+Entities
+    Librarian
+        id
+        first_name
+        last_name
+    Member
+        id
+    Card
+        id
+        first_name
+        last_name
+    Author
+        first_name
+        last_name
+    Book
+        id
+        isbn
+        rack_num
+        title
+        author
+        subject
+        publishing_date
+        items
+    Item
+    Log
+        take
+            card
+            date
+        return
+            card
+            date
+        reserve
+            card
+            date
+        ? renew
+            card
+            date

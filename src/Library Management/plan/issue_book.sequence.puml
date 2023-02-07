@@ -1,0 +1,20 @@
+@startuml
+actor Member
+actor Librarian
+participant Book
+
+Member -> Librarian++: get book
+Librarian -> Librarian: check member books
+alt member books = max
+    Librarian --> Member: limit is reached
+else
+    Librarian -> Book++: check book
+    Book --> Librarian--: get book status
+    alt book is available
+        Librarian --> Member: get book
+    else book is reserved
+        Librarian --> Member--: book is not available
+    end alt
+end alt
+
+@enduml

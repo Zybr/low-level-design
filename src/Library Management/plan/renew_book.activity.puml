@@ -1,0 +1,13 @@
+@startuml
+
+start
+:1. Enter book ID;
+:2. System fetches book's details;
+if (3. Due date passed?) then (no)
+    :4. Calculate fine;
+    :5. Generate receipt;
+    :6. Collect fine;
+endif
+    :7. Create book checkout transaction with new due date;
+
+@enduml

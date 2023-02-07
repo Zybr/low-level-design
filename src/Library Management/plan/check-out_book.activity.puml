@@ -1,0 +1,18 @@
+@startuml
+start
+
+:Enter member id;
+:Enter user id;
+if (is max quota reached?) then (yes)
+    :Show error;
+else (no)
+    if (is book available) then (yes)
+        :Book payment;
+        :Book status issued;
+        :increment member issued number;
+    else
+        :Show error;
+    endif
+endif
+
+@enduml

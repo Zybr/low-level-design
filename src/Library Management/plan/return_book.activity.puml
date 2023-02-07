@@ -1,0 +1,18 @@
+@startuml
+start
+:enter member ID;
+:init book return;
+if (did due date pass?) then (yes)
+    :calculate fine;
+    :generate receipt;
+    :collect fine;
+endif
+:decrement number off member issued book;
+if (is book reserved) then (yes)
+    :set books status to "reserved";
+    :inform member who reserved about the book status;
+else (no)
+    :set book status to "available";
+endif
+
+@enduml

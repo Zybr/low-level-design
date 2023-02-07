@@ -1,0 +1,49 @@
+@startuml
+actor Member
+participant System
+participant Reservation
+participant BookLending
+actor OtherMember
+
+==Reservation==
+autonumber 1.1
+
+Member -> System++: reserve
+System -> Reservation**
+Member <-- System--:  reservation
+
+==Cancel reservation==
+autonumber 2.1
+
+Member -> System++: cancel reservation
+System -> Reservation!!: set status **Cancel**
+System -> OtherMember--: notify of **new** free reservation
+
+==Lend book==
+autonumber 3.1
+
+Member -> System++: lend book
+System -> BookLending**: create
+System -> OtherMember: notify of **next** free reservation
+System --> Member--: item
+
+==Renew lending==
+autonumber 4.1
+
+Member -> System++: renew lending
+System -> BookLending: update due-date
+System -> OtherMember--: notify of **next** free reservation
+
+==Return book==
+autonumber 5.1
+
+Member -> System++: return book
+System -> BookLending: set returned-date
+System -> OtherMember--: notify of **new** free reservation
+alt is overdue
+    System --> Member: fine
+else
+    System --> Member: ok
+end
+
+@enduml

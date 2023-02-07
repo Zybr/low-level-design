@@ -1,0 +1,186 @@
+@startuml
+
+class Address {
+    + country: string
+    + state
+    + city: string
+    + streetAddress: string
+    + zipCode: string
+}
+
+class Notification {
+    + id: string
+    + createdTime: DateTime
+    + content: string
+    + send()
+}
+
+class PostNotification extends Notification {
+    + address: Address
+}
+PostNotification o--> Address
+
+class EmailNotification extends Notification {
+    + email: string
+}
+
+class Rack {
+    + id: string
+    + location: string
+    + items: BookItem[]
+}
+
+enum Format {
+    + Hardcover
+    + Paperback
+    + AudioBook
+    + Ebook
+    + NewsPaper
+    + Magazine
+    + Journal
+}
+
+abstract class Book {
+    + isbn: string
+    + title: string
+    + subject: string
+    + authors: Author
+    + publisher: string / (Class)
+    + publicationDate: Date
+    + pagesNumber: int
+    + language: string / (Enum)
+    + format: Format
+}
+Book *--> Format
+
+enum BookStatus {
+    + Available
+    + Reserved
+    + Loaned
+    + Lost
+}
+
+class BookItem extends Book {
+    - id: string
+    - status: BookStatus
+    - rack: Rack
+    - price: double
+    - ? referenceOnly: bool
+    - dueDate: Date
+    - purchasedDate: Date
+    - borrowedDate: Date
+    + checkout(member: Member)
+}
+BookItem *--> BookStatus
+BookItem "*" <--> "1" Rack
+BookItem ..> Member
+
+class Library {
+    + books
+}
+Library *--> Book
+
+interface Search {
+    + searchByTitle(title: string): Book[]
+    + searchBySubject(subject: string): Book[]
+    + searchByAuthor(authorName: string): Book[]
+    + searchByPublicationDate(Date: string): Book[]
+}
+
+class Catalog implements Search {
+    - books: Book[]
+}
+Catalog o--> Book
+
+class Person {
+    + firstName: string
+    + lastName: string
+    + address: Address
+    + email: string
+    + phone: string
+}
+Person o--> Address
+
+class Author extends Person {
+    books: Book[]
+}
+Author "*" <--> "*" Book
+
+class LibraryCard {
+    + id: string
+    + createdDate: Date
+    + active: bool
+}
+
+abstract class User {
+    + id
+    + login
+    - password
+    + person - card: LibraryCard
+    + card: LibraryCard
+    + resetPassword(old: string, new: string): bool
+}
+User ..> Search
+User *--> LibraryCard
+
+class Librarian extends User {
+    + addItem(item: BookItem)
+    + blockMember(member: Member)
+    + unblockMember(member: Member)
+}
+Librarian ..> BookItem
+Librarian ..> Member
+
+class Member extends User {
+    - createdDate: Date
+    + checkOutedNum: int
+    + reserveItem(item: BookItem)
+    + cancelReservation(item: BookItem)
+    + checkoutItem(item: BookItem)
+    + renewItem(item: BookItem)
+    + returnItem(item: BookItem)
+    + checkForFine(item): amount
+}
+
+enum ReservationStatus {
+    + Waiting
+    + Pending
+    + Canceled
+    + None
+}
+note left of ReservationStatus::None
+ ?
+end note
+
+class BookReservation {
+    - item: BookItem
+    - member: Member
+    - createdDate: Date
+    + status: ReservationStatus
+    + fetchReservationDetails(item: BookItem): BookReservation
+}
+note left of BookReservation::fetchReservationDetails
+?
+end note
+BookReservation --> BookItem
+BookReservation --> Member
+BookReservation *--> ReservationStatus
+
+class BookLending {
+    - item: BookItem
+    - member: Member
+    - createdDate: Date
+    - dueDate: Date
+    + returnedDate: ?Date
+    + fetchLendingDetails(item: Book): BookLending
+}
+note left of BookLending::fetchLendingDetails
+?
+end note
+BookLending --> BookItem
+BookLending --> Member
+'BookLending <--> BookReservation
+'BookLending <--> Notification
+
+
+@enduml

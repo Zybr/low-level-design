@@ -1,0 +1,26 @@
+@startuml
+autonumber
+actor Member
+actor Librarian
+participant BookItem
+participant LibraryCard
+participant FineTransaction
+
+Member -> Librarian++: returnBook(BookItem)
+activate Member
+Librarian -> BookItem++: getDueDate()
+BookItem --> Librarian: return dueDate
+Librarian -> BookItem: updateBookStatus(available)
+BookItem --> Librarian: bookStatus updated
+Librarian --> Member: return book successful
+opt currentDAte > dueDate
+    Librarian -> LibraryCard++: calculateFine(member, days)
+    LibraryCard --> Librarian--: return fine
+    Librarian -> Member: requestPayment(find)
+    Member -> Librarian: payFind(fine)
+    Librarian -> FineTransaction**: initiateFineTransaction()
+    activate FineTransaction
+    FineTransaction -->  Librarian--: payment successful
+    Librarian --> Member: fine paid
+end opt
+@enduml
