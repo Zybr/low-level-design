@@ -1,0 +1,103 @@
+@startuml
+
+class Item {
+    + id: string
+    + quantity: int
+}
+
+class Location {
+    + longitude: float
+    + latitude: float
+}
+
+class Order {
+    + id: string
+    + items: Item[]
+    + location: Location
+}
+Order *--> Item
+Order o--> Location
+
+class Customer {
+
+}
+
+class Notification {
+    + order: Order
+    + customer: Customer
+    + code: string
+    + locker: Locker
+    + send()
+}
+note left of Notification::send
+    ? it shouldn't snd itself
+end note
+Notification <--> Order
+Notification <--> Locker
+Notification o--> Customer
+
+class Package {
+    + id: string
+    + size: float
+    - order: Order
+    + pack()
+}
+note left of Package::pack
+    ? - **constructor**(order)
+end note
+Package *--> Order
+
+class LockerPackage {
+    - locker: Locker
+    - package: Package
+    - code: string
+    - validDays: int
+    - deliveredAt: Date
+    + --isValidCode():-- bool
+    + verifyCode(code: string): bool
+}
+LockerPackage <--> Package
+
+enum LockerSize {
+    + ExtraSmall
+    + Small
+    + Medium
+    + Large
+    + ExtraLarge
+    + DoubleExtraLarge
+}
+
+enum LockerState {
+    + Available
+    + Booked
+    + Closed
+}
+
+class Locker {
+    + id
+    + location: LockerLocation
+    + size: LockerSize
+    + state: LockerState
+    -? package: LockerPackage | null
+    + addPackage (package: LockerPackage)
+    + removePackage (): LockerPackage | null
+}
+Locker *--> LockerSize
+Locker *--> LockerState
+Locker *--> LockerPackage
+
+class LockerLocation {
+    + id
+    + lockers: Locker[]
+    + openTime: Time
+    + closeTime: Time
+}
+LockerLocation o--> Location
+LockerLocation *--> Locker
+
+class LockerService {
+    + locations: LockerLocation[]
+}
+LockerService *--> LockerLocation
+
+@enduml

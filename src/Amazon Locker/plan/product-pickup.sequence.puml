@@ -1,0 +1,17 @@
+@startuml
+start
+:Customer receive OPT code;
+:Customer goes to locker;
+:Customer enters code;
+if (code validation) then (correct)
+    if (time is expired) then (yes)
+        stop
+    endif
+    :search for locker;
+    :open locker;
+    :customer pickup product;
+else (incorrect)
+    stop
+endif
+stop
+@enduml

@@ -1,0 +1,22 @@
+@startuml
+Customer -> System++: requestReturn(package)
+activate Customer
+alt request approved
+    System -> Locker++: requestLocker()
+    Locker --> System--: return locker
+    System --> Customer: send OPT code
+
+    Customer -> System: verify OPT code
+    alt verification successful
+        System --> Customer: assign locker
+        Customer -> Locker++: place package
+        deactivate
+    else
+        System --> Customer: error
+    end alt
+else request unapproved
+    System --> Customer: return not approved
+end alt
+
+
+@enduml

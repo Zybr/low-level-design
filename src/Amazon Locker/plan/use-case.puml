@@ -1,0 +1,37 @@
+@startuml
+left to right direction
+
+actor :Delivery Guy:
+actor Customer
+actor System
+
+Customer --> (Enter code)
+Customer --> (Add product)
+Customer --> (Remove product)
+Customer --> (Submit return request)
+Customer --> (Delivery notification)
+Customer --> (Overdue notification)
+
+:Delivery Guy: --> (Enter code)
+:Delivery Guy: --> (Add product)
+:Delivery Guy: --> (Remove product)
+:Delivery Guy: --> (Return notification)
+
+(Issue locker) <-- System
+(Validate code) <-- System
+(Find locker) <-- System
+(Lock/unlock door) <-- System
+(Generate code) <-- System
+(Overdue notification) <-- System
+(Delivery notification) <-- System
+(Return notification) <-- System
+
+(Enter code) ..> (Validate code)
+(Validate code) ..> (Find locker)
+(Find locker) ..> (Lock/unlock door)
+
+(Submit return request) ..> (Return notification)
+(Return notification) ..> (Generate code)
+
+
+@enduml

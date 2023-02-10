@@ -1,0 +1,115 @@
+enum Size
+    + Small
+    + Middle
+    + Large
+    + ExtraLarge
+
+Item
+    + id
+    + size: Size
+
+Person
+    + firstName
+    + lastName
+    + address: Address
+    + email
+    + phone
+
+User
+    + person: Person
+    + username: string
+    + password: string
+    + resetPassword(oldPassword, newPassword): boolean
+    + informOfOrder(order, code)
+    + getOrder(order)
+        order.box.lockery.open(code)
+    + returnOrder(order)
+        backOrder = system.return(order, lockery)
+        backOrder.box.lockery.open()
+
+enum PaymentStatus
+    + unpaid
+    + paid
+
+Payment
+    + status: PaymentStatus = unpaid
+    + amount
+
+enum OrderStatus
+    + unpaid
+    + paid
+    + moving
+    + inBox
+    + delivered
+
+Order / BackOrder
+    + user: User
+    + item: Item
+    + locker: Locker
+    + code: number // Code to put in box
+    + status
+
+BackOrderStatus
+    + rejected
+    + inBox
+
+System
+    - orders: Order[]
+    + items: Item[]
+    + lockers: Locker[]
+    + order(user, item, lock): Order
+        create order
+        order.status = unpaid
+        order.item = item
+        order.user = user
+        order.code = generate()
+        this.orders.push(order)
+    + pay(order, amount): boolean
+        order.status = paid
+    + return(order, lock): BackOrder
+        backOrder.user = order.user
+        backOrder.item = order.item
+        backOrder.status = order.rejected
+        backOrder.code = generate()
+    + delivered(order)
+        order.status = delivered
+        delete order
+    + returned(order)
+        items.push(order.item)
+        delete order
+Courier
+    + deliver(order)
+        order.status = moving
+        order.box.locker.open(order.code)
+    + deliverBack(backOrder)
+        backOrder.box.locker.open(backOrder.code)
+        backOrder.status = moving
+        system.returned(order)
+
+Address
+    + country
+    + state
+    + zipCode
+    + streetAddress
+
+Box
+    + locker: Locker
+    + size: Size
+    + order: Order
+    + close()
+
+Locker
+    + boxes: Boxes[]
+    + address: Address
+    + open(code: number): bool
+        define order by box
+        if (order)
+            if (order.status !== inBox) // Courier put item
+                order.status = inBox
+                order.code = generate()
+                order.user.informOfOrder(order)
+            else // User received item
+                system.delivered(order)
+        else // back-order
+            if (order.status !== inBox) // User put item
+                order.status = inBox

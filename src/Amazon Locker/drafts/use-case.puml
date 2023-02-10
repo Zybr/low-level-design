@@ -1,0 +1,60 @@
+@startuml
+
+left to right direction
+
+actor Customer
+actor Courier
+
+'package system {
+    usecase put_order_actions as "
+    - go to locker
+    - type code -> open box
+    - **put order**
+    - close door
+    "
+
+    usecase deliver_actions as "
+    - go to locker
+    - type code -> open box
+    - **put order**
+    - close door
+    "
+    (deliver_actions) ..> (generate code)
+    (deliver_actions) ..> (inform customer about code)
+
+    usecase get_order_actions as "
+    - go to locker
+    - type code -> open box
+    - **fetch order**
+    - close door
+    "
+
+    (make order)
+        (make order) ..> (choose items)
+            (choose items) ..> (define box size)
+        (make order) ..> (choose locker)
+            (choose locker) ..> (generate code)
+            (choose locker) ..> (inform courier about code)
+            (choose locker) ..> (define box by size)
+
+    (return order)
+        (return order) ..> (choose locker)
+        (return order) ..> (put_order_actions)
+
+    (deliver) ..> (deliver_actions)
+
+    (get order) ..> (get_order_actions)
+'}
+
+Customer --> (make order)
+Customer --> (get order)
+Customer --> (return order)
+Courier --> (deliver)
+
+(define box size)#silver
+(define box by size)#silver
+(generate code)#silver
+(inform customer about code)#silver
+(inform courier about code)#silver
+
+@enduml

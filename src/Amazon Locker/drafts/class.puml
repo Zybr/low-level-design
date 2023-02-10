@@ -1,0 +1,112 @@
+@startuml
+enum Size {
+    + S
+    + M
+    + L
+    + XL
+    + XXL
+}
+
+class Item {
+    + id: string
+    + size: Size
+}
+Item o--> Size
+
+class Order {
+    + id: string
+    + items: Item[]
+}
+Order "1" o--> "1..*" Item
+
+class Storage {
+    - items: Item[]
+}
+Storage "1" o--> "*" Item
+
+class Address {
+    + country: string
+    + state: string
+    + addressString: string
+    + zipCode: string
+}
+
+class Notification {
+    + content
+}
+Notification <|-- DeliveryNotification
+Notification <|-- OverdueNotification
+Notification <|-- ReturnNotification
+
+enum BoxState {
+    + OPENED
+    + CLOSED
+}
+
+class Box {
+    + id: string
+    + size: Size
+    + state: BoxState
+    + locker: Locker
+    - order: Order | null
+    + put (order: Order)
+    + remove (): Order | null
+}
+Box o--> Size
+Box *--> BoxState
+Box "0" o--> "1" Order
+
+class Locker {
+    + id: string
+    + address: Address
+    + boxes: Box[]
+    + enterCode (code: number): Box
+}
+Locker o--> Address
+Locker "1" *--> "*" Box
+
+class Deliverer {
+    + deliverOrder (order, locker)
+    + returnOrder (order, locker)
+    + notify (notification: Notification)
+    # putProduct (locker: Locker, order: Order)
+    # removeProduct (locker: Locker, order: Order)
+}
+Deliverer ..> Locker
+Deliverer ..> Order
+Deliverer ..> Notification
+
+class Person {
+    + firstName: string
+    + lastName: string
+    + address: Address
+    + phone: string
+    + email: string
+}
+Person o--> Address
+
+class Customer {
+    + person: Person
+    + makeOrder (items: Item[])
+    + returnOrder (order: Order)
+    + notify (notification: Notification)
+    # putProduct (locker: Locker, order: Order)
+    # removeProduct (locker: Locker, order: Order)
+}
+Customer *--> Person
+Customer ..> Locker
+Customer ..> Order
+Customer ..> Notification
+
+class System {
+    + issueLocker (address: Address, order: Order)
+    + open (locker: Locker, code: number): Box
+    + notify (notification: Notification)
+    - generateCode (box: Box): number
+}
+System ..> Address
+System ..> Locker
+System ..> Box
+System ..> Notification
+
+@enduml

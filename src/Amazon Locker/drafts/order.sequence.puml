@@ -1,0 +1,26 @@
+@startuml
+Customer -> System++: choose items
+Customer -> System: choose quantity
+Customer -> System: choose location
+Customer -> System: order
+
+System -> System: define locker location
+System -> Order**: make order
+System --> Customer: order created
+System -> Package**: pack order
+
+System -> Courier++: deliver order
+Courier -> Locker: put package
+Locker -> Notification**: create
+Notification -> Notification: send
+Notification --> Customer: order is delivered
+deactivate Courier
+
+Customer -> Locker++: type code
+Locker -> Locker: verify code
+alt code is correct and not expired
+    Locker -> Customer--: package
+end
+deactivate System
+
+@enduml
