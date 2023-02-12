@@ -1,0 +1,76 @@
+@startuml
+
+class Product {
+    - id: int
+    - name: string
+    - price: int
+}
+
+class Rack {
+    - id: int
+    - productId: int
+    - products: Product[]
+    + getId (): int
+    + getProductId (): int
+    + addProduct (product: Product)
+    + removeProduct (product: Product)
+    + isEmpty (): bool
+}
+Rack o--> Product
+
+class Account {
+    - money: int
+    + total(): int
+    + add(money: int)
+    + withdraw(money: int)
+}
+
+class Inventory {
+    - account: Account
+    - racks: Rack[]
+    + getAccount(): Account
+    + getRacks (): Rack[]
+    + addProduct (product: Product): int
+    + removeProduct (product: Product): int
+}
+Inventory o--> Account
+Inventory o--> Rack
+
+class VendingMachine {
+    - account: Account
+    - racks: Rack[]
+    - inventory: Inventory
+    --admin, internal--
+    + getInventory (): Inventory
+    + setState (state)
+    --customer--
+    + insertMoney (money: int)
+    + chooseRack (rackId: int)
+    + getProduct (): Product | null
+    + getChange (): int
+}
+VendingMachine *--> Account
+VendingMachine *--> Rack
+VendingMachine *--> Inventory
+VendingMachine *--> State
+
+interface State {
+    - account: Account
+    - racks: Rack
+    + insertMoney (money: int)
+    + chooseRack (rackId: int)
+    + getProduct (): Product | null
+    + getChange (): int
+}
+State --> Account
+State --> Rack
+
+class NoMoneyInsertedState {}
+class MoneyInsertedState {}
+class DispenseState {}
+
+State <|.down.. NoMoneyInsertedState
+State <|.down.. MoneyInsertedState
+State <|.down.. DispenseState
+
+@enduml

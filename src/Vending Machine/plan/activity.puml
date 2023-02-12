@@ -1,0 +1,25 @@
+@startuml
+
+start
+
+while (is money inserted?) is (yes)
+
+    repeat
+        :select product;
+    repeat while (is product available?) is (no)
+
+    if (money < price) then (yes)
+    elseif (money = price)
+        :dispense product;
+        stop
+    elseif (money > price)
+        :dispense change;
+        :dispense product;
+        stop
+    endif
+
+    backward:dispense money back;
+
+endwhile
+
+@enduml

@@ -1,5 +1,5 @@
 import Factory from "./Factory";
-import { isNumber } from "../../utils/utils";
+import { isNumber } from "../../utils";
 import PaymentStatus from "../src/Payment/Enums/PaymentStatus";
 import CashPayment from "../src/Payment/Payments/CashPayment";
 

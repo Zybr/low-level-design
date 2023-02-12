@@ -1,0 +1,38 @@
+Product
+
+ProductItem
+    price: float
+
+VendingMachine
+    racks: Rack[]
+    panel: Panel
+    insertMoney(amount)
+    getChange(): number
+    getItem(): Item | null
+
+Panel
+    typeNumber(number)
+    getText()
+        nothing
+        number
+        error
+
+Rack
+    number: int
+    items: Items
+
+MachineState
+    NoMoneyInserted
+    MoneyInserted
+    Dispense
+    ? Error
+
+User
+    Admin
+        addItem(item)
+        removeItem(item)
+
+    Customer
+        insertMoney(machine, amount)
+        typeRackNumber(machine, number)
+        getItem

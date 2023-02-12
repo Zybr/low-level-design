@@ -1,0 +1,86 @@
+@startuml
+class Product {
+    - name: string
+    - price: int
+    + getName(): string
+    + getPrice(): int
+}
+
+class ProductItem {
+    - product: Product
+    + getProduct(): Product
+}
+ProductItem o--> Product
+
+class Rack {
+    - size: int
+    - items: ProductItem[]
+    - product: Product
+    + getSize(): int
+    + getCapacity(): int
+}
+Rack o--> Product
+Rack o--> ProductItem
+
+interface State {
+    - money: int
+    - change: int
+    - hasProduct: bool
+    - text: string
+    + insertMoney(amount: int)
+    + selectProduct(amount)
+    + takeChange(): amount
+    + hasProduct(): bool
+    + getText(): string
+}
+State o--> VendingMachine
+
+class MoneyInsertedSate implements State {
+}
+
+class NoMoneyInsertedSate implements State {
+}
+
+class DispenseState implements State {
+}
+
+class VendingMachine {
+    - racks: Rack[]
+    - state: State
+    --internal--
+    + setState(state)
+    --admin--
+    + addProduct(item: Product)
+    + removeProduct(item: Product)
+    + removeCache(): amount
+    --customer--
+    + getProducts(): Rack[]
+    + insertMoney(amount: int)
+    + selectProduct(rackNum: int)
+    + takeProduct(): ProductItem | null
+    + takeChange(): amount
+    + getText(): string
+}
+note left of VendingMachine::getProducts
+indexed by rack numbers
+end note
+VendingMachine "1" *--> "1.." Rack
+VendingMachine *--> State
+
+class Customer {
+    - money: int
+    - items: ProductItem[]
+    + setMoney(amount: int)
+    + getItems(): ProductItem[]
+    + buy(machine, product)
+}
+Customer ..> VendingMachine
+Customer ..> ProductItem
+
+class Operator extends Customer {
+    - items: ProductItem[]
+    - money: int
+    + fill(machine)
+}
+
+@enduml

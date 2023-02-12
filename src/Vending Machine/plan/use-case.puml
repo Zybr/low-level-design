@@ -1,0 +1,30 @@
+@startuml
+left to right direction
+
+actor Customer
+actor Operator
+actor System
+
+package "Vending machine" {
+    Customer --> (View products)
+    Customer --> (Select product)
+    (Select product) ..> (Search product): <<include>>
+    Customer --> (Insert money)
+    Customer --> (Take product)
+    Customer --> (Take change)
+
+    Operator --> (Add product)
+    Operator --> (Remove product)
+    Operator --> (Cache remove)
+    Operator --|> Customer
+
+    (Search product) <-- System
+    (Dispense product) <-- System
+    (Validate money) <-- System
+    (Return change) <-- System
+    (Validate money) ..> (Dispense product): <<include>>
+    (Validate money) <.. (Return change) : <<extend>>
+    (Validate money) <.. (Show error): <<extend>>
+}
+
+@enduml

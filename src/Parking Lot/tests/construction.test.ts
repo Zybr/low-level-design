@@ -1,5 +1,5 @@
 import ParkingLot from "../src/ParkingLot";
-import { areEqualEntities, isNumber } from "../../utils/utils";
+import { areEqualEntities, isNumber } from "../../utils";
 import Compact from "../src/ParkingSpots/Compact";
 import Handicapped from "../src/ParkingSpots/Handicapped";
 import Large from "../src/ParkingSpots/Large";

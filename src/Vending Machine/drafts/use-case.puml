@@ -1,0 +1,19 @@
+@startuml
+left to right direction
+
+actor Admin
+actor Customer
+
+package "Vending machine" {
+    (add product) <-- Admin
+    (remove product) <-- Admin
+
+    Customer --> (by product)
+    (by product) ..> (insert money)
+    (by product) ..> (choose product)
+    (choose product) ..> (type rack number)
+    (by product) ..> (get change)
+    (by product) ..> (get product)
+}
+
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+start
+
+:insert money;
+:select track;
+if (money enough) then (yes)
+    if (there is exchange) then (yes)
+        :return exchange;
+    endif
+    :dispense product;
+else (no)
+    :show error;
+    :return money;
+endif
+
+stop
+
+@enduml

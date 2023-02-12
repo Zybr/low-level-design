@@ -1,0 +1,67 @@
+@startuml
+enum ProductType {
+    + Chocolate
+    + Snack
+    + Beverage
+    + Other
+}
+
+class Product {
+    - id: int
+    - name: string
+    - price: int
+    - type: ProductType
+}
+Product *--> ProductType
+
+class Rack {
+    - id: int
+    - productId
+    + isEmpty(): bool
+}
+Rack --> Product: productId -> product.id
+
+class Inventory {
+    - productsNum: int
+    - products: Product[]
+    + addProduct(rackId: int, productId: int)
+    + removeProduct(rackId: int, productId: int)
+}
+note right of Inventory::productsNum
+can be calculated
+end note
+'Inventory -- Rack
+Inventory *--> Product
+
+interface State {
+    + insertMoney(money: int)
+    + pressButton(rackId: int)
+    + returnChange(money: int)
+    + updateInventory(rackId: int)
+    + dispenseProduct(rackId)
+}
+note right of State::updateInventory
+?
+end note
+
+class NoMoneyInsertedState implements State {}
+class MoneyInsertedState implements State {}
+class DispenseState implements State {}
+
+class VendingMachine {
+    + insertMoney(money: int)
+    + pressButton(rackId: int)
+    + returnChange(money: int)
+    + updateInventory(rackId: int)
+    + dispenseProduct(rackId)
+    + getProductAtRack(rackId: int): int
+}
+note left of VendingMachine::getProductAtRack
+what does it return?
+end note
+VendingMachine *--> Rack
+VendingMachine -- Inventory
+VendingMachine *--> State
+
+
+@enduml
