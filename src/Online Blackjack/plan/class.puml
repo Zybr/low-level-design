@@ -1,0 +1,129 @@
+@startuml
+
+enum Suit {
+    + Heart
+    + Spade
+    + Club
+    + Diamond
+}
+
+class Card {
+    - suite: Suit
+    - value: number
+    + getSuite(): Suit
+    + getValue(): number
+}
+Card *--> Suit
+
+class Deck {
+    - cards: Card[]
+    + {static} create(): Deck
+    + getCards(): Card[]
+}
+Deck *--> Card
+
+class Shoe {
+    - decks: Deck[]
+    - inx: number
+    + {static} create(decksNumber: number): Shoe
+    + shuffle()
+    + getTop(): Card | null
+}
+Shoe *--> Deck
+
+class Hand {
+    - cards: Card[]
+    + addCard(card: Card)
+    + getScore(): int
+}
+Hand o--> Card
+
+class Address {
+    + country: string
+    + city: string
+    + streetAddress: string
+    + zipCode: string
+}
+
+class Person {
+    + name: string
+    + address: Address
+}
+Person *--> Address
+
+class Account {
+    - money: int
+    + addMoney(money: int)
+    + minusMoney(money: int)
+}
+
+enum UserStatus {
+    + Active
+    + Canceled
+    + Blacklisted
+    + Banned
+    + ? Closed
+    + ? None
+}
+
+
+abstract class User {
+    - person: Person
+    - account: Account
+    - username: string
+    - password: string
+    - status: UserStatus
+    + getPerson(): string
+    + getUsername(): string
+}
+User *--> UserStatus
+User *--> Person
+User *--> Account
+
+abstract class Player extends User {
+    - hand: Hand | null
+    + setHand(hand | null)
+    + addCardToHand(card: Card)
+    + getScore(): int
+}
+Player *--> Hand
+
+class Gambler extends Player {
+}
+
+class Dealer extends Player {
+    + createGame(player: Player): Game
+}
+Dealer ..> Game
+
+enum Action {
+    + Hit
+    + Stand
+}
+
+class GameController {
+    + can(hand: Hand, action: Action): bool
+}
+GameController ..> Action
+
+class GameLog {
+    + result(player: Gambler, dealer: Dealer)
+}
+Gambler --> Game
+
+class Game {
+    - controller: GameController
+    - log: GameLog
+    - shoe: Shoe
+    - player: Gambler
+    - dealer: Dealer
+    + start()
+    + placeBet(money: int)
+    + hit(hand: Hand)
+    + stand(hand: Hand)
+}
+Game *--> GameController
+Game *--> GameLog
+Game *--> Shoe
+
+@enduml

@@ -1,0 +1,62 @@
+CardSuit
+    HEART
+    CROSS
+    DIAMOND
+    PEAK
+
+CardValue
+    ACE
+    2..10
+    JACK
+    QUEEN
+    KING
+
+Card
+    suit: Suit
+    value: CardValue
+    isOpen: bool
+    getPoints(): number
+
+Deck
+    cards: Card[]
+
+Shoe
+    Decks: Deck[]
+
+Bet
+    amount: number
+
+UserState
+    NONE
+    PLAY
+    STOP
+
+User
+    money: number
+    cards: Card[]
+    state: UserState
+    bit(money)
+    ? move()
+        takeCard()
+        stop()
+    getPoints(): number
+    takeMoney(money: number)
+    removeCards(): Card[]
+
+Dealer --|> User
+
+Player --|> User
+
+GameState
+    NOT_STARTED
+    DEAL_CARDS
+    PLAYERS_PLAY
+    DEALER_PLAYS
+
+Game
+    currentPlayer: User
+    dealer: Dealer
+    players: Player[]
+    state: GameState
+    start()
+    next()

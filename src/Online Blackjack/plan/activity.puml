@@ -1,0 +1,38 @@
+@startuml
+start
+:Player place bet;
+:Dealer deal 2 cards for itself and 2 for the player;
+label calculate
+switch (calculate player card total)
+    case ([total > 21])
+        :Player loses;
+        :Dealer collect the bet;
+    case ([total = 21])
+        :Player wins;
+        :Dealer pay 150% of the bet;
+    case ([total < 21])
+        fork
+            :stand;
+            while (Dealer's card \n total < 17) is (yes)
+                :Dealer get another card;
+            endwhile
+            switch (Compare player and\n dealer card total)
+                case ([player total > dealer total])
+                    :Player wins;
+                    :Dealer pay equal to the bet;
+                case ([player total = dealer total])
+                    :Its a tie;
+                    :Player gets their bet back;
+                case ([player total < dealer total])
+                    :Player loses;
+                    :Dealer collect the bet;
+            endswitch
+        fork again
+            :hit;
+            :Player get another card;
+            goto calculate
+        end fork
+endswitch
+stop
+'endwhile
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+left to right direction
+
+Player --> (Create account)
+Player --> (Update account)
+Player --> (Reset password)
+(Reset password) ..> (Update account): include
+Player --> (Cancel membership)
+(Cancel membership) ..> (Modify member): extends
+Player --> (Login/logout)
+
+Player --> (View open games)
+Player --> (Join a game)
+Player --> (Resigns a game)
+
+Player --> (Place a bit)
+Player --> (Hit)
+(Hit) ..> (Draw card): include
+Player --> (Stand)
+(Stand) ..> (Collect or payout): include
+
+(Login/logout) <-- Dealer
+(Create account) <-- Dealer
+(Update account) <-- Dealer
+(Cancel membership) <-- Dealer
+(Block member) <-- Dealer
+(Block member) ..> (Modify member): extends
+(Reset password) <-- Dealer
+(View open games) <-- Dealer
+(Create a new game) <-- Dealer
+(Create hands) <-- Dealer
+(Create hands) ..> (Draw card): include
+(Draw card) <-- Dealer
+(Collect or payout) <-- Dealer
+
+@enduml

@@ -1,0 +1,24 @@
+@startuml
+left to right direction
+
+actor Player
+actor Dealer
+
+Player <|- Dealer
+
+Player --> (make bit)
+Player --> (take card)
+(take card) <.. (get less max[17/21] points): extend
+(get less max[17/21] points) <.. (loose bit): extend
+(get less max[17/21] points) <.. (save bit): extend
+(get less max[17/21] points) <.. (take money = bit): extend
+(take card) <.. (get 21): extend
+(get 21) <.. (loose bit): extend
+(get 21) <.. (save bit): extend
+(get 21) <.. (take money = bit * 1.5): extend
+(take card) <.. (get more 21 points): extend
+(get more 21 points) ..> (loose bit): include
+Player --> (stop taking)
+(stop taking) ..> (run Dealer's play): include
+
+@enduml

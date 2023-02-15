@@ -1,0 +1,131 @@
+@startuml
+enum CardSuit {
+    + HEART
+    + CROSS
+    + DIAMOND
+    + PEAK
+}
+
+enum CardValue {
+    + ace
+    + 2
+    + 3
+    + 4
+    + 5
+    + 6
+    + 7
+    + 8
+    + 9
+    + Jack
+    + Queen
+    + King
+}
+
+class Card {
+   - suit: CardSuit
+   - value: CardValue
+   - isOpen: bool
+   + getPoints(): int
+}
+Card *--> CardSuit
+Card *--> CardValue
+
+class Deck {
+    - cards: Card[]
+}
+Deck *--> Card
+
+class Shoe {
+    - decks: Deck
+    + reset()
+    + draw(): Card
+}
+Shoe *--> Deck
+
+class Account {
+    - money: int
+    + add(money: int)
+    + minus(money: int)
+}
+
+class Bet {
+    - money: int
+    + set(money: int)
+    + clear(): int
+}
+
+enum UserState {
+    + NONE
+    + PLAY
+    + STOP
+}
+
+class Hand {
+    - cards: Card[]
+    + addCard(card: Card)
+    + removeCards(): Card[]
+    + getPoints(): int
+}
+
+class User {
+    - username: string
+    - password: string
+    - state: UserState
+    - game: Game | null
+    + account: int
+    + hand: Hand | null
+    --account--
+    + resetPassword(old, new)
+    --game--
+    + play()
+    + onPlay(strategy: callback)
+    # hit()
+    # stand()
+}
+note left of User::play
+inform user about his move
+end note
+User *--> Account
+User *--> UserState
+User --> Game
+User "1" o--> "1" Hand
+
+class Player extends User {
+    + joinGame(game: Game)
+    + quitGame()
+    # placeBet(money: number)
+}
+Player <..> Dealer: draw() / hit()
+
+class Dealer extends User {
+    - shoe: Shoe
+    + draw(): Card
+    + createGame(): Game
+    + createHands()
+}
+Dealer "1" *--> "1" Shoe
+
+class Game {
+    + bet: Bet
+    + dealer: Dealer
+    + player: Player
+    + involve(player: Player)
+    + setBet(money: number)
+    + finish()
+}
+Game "1" *--> "1" Dealer
+Game "1" *--> "1" Player
+Game "1" *--> "1" Bet
+
+class System {
+    - games: Game[]
+    - users: User[]
+    + createPlayer(username: string, password: string)
+    + createDealer(username: string, password: string)
+    + login(username: string, password: string): User
+    + getGames(): Game[]
+}
+System "1" *--> "*" User
+System "1" *--> "*" Game
+
+@enduml

@@ -1,0 +1,45 @@
+@startuml
+start
+:**player**: place a bet;
+:**player**: take 2 cards;
+:**dealer**: take 2 cards;
+while (**player**: does have enough points?) is (no)
+    :**player**: take a card;
+    if (**player** points **> 21**) then (yes)
+        :**player**: lose bet;
+        stop
+    endif
+end while
+
+while (**dealer**: does have enough points?) is (no)
+    if (**dealer** points **>= 17**) then (yes)
+        break
+    else (no)
+        :**dealer**: take a card;
+        if (**dealer**: points **> 21**) then (yes)
+            :**player**: get the bet back;
+            if (**player** points **= 21**) then (yes)
+                :**player**: win bet *** 1.5**;
+            else (no)
+                :**player**: win bet *** 1**;
+            endif
+            stop
+        endif
+    endif
+end while
+
+if (**player** points **=** **dealer** points) then (yes)
+    :**player**: get the bet back;
+(no) else if (**player** points **<** **dealer** points) then (yes)
+    :**player**: lose bet;
+else (no (**player** points **>** **dealer** points))
+    :**player**: get the bet back;
+    if (**player** points **= 21**) then (yes)
+        :**player**: win bet *** 1.5**;
+    else (no)
+        :**player**: win bet *** 1**;
+    endif
+endif
+
+stop
+@enduml
