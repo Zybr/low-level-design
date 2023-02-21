@@ -1,0 +1,25 @@
+@startuml
+actor Organizer
+actor Participant
+
+Organizer --|> Participant
+Organizer --> (book meeting)
+(book meeting) ..> (choose room): include
+(book meeting) ..> (choose time interval): include
+(book meeting) ..> (invite participant)
+    (invite participant) ..> (inform participants): include
+        (inform participants) ..> (receive notification): include
+Organizer --> (invite participant)
+    (invite participant) ..> (updated meeting): include
+Organizer --> (cancel meeting)
+    (cancel meeting) ..> (updated meeting): include
+
+Participant --> (see meetings)
+Participant --> (receive notification)
+(receive notification) ..> (response): include
+    (response) <.. (accept): extend
+        (accept) ..> (updated meeting): include
+    (response) <.. (reject): extend
+        (reject) ..> (updated meeting): include
+
+@enduml

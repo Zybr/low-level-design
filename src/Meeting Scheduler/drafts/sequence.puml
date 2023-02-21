@@ -1,0 +1,36 @@
+@startuml
+actor Organizer
+participant Scheduler
+participant Meeting
+participant Participant
+participant InviteNotification
+participant CancelNotification
+actor User
+
+==Book==
+Organizer -> Scheduler++: Book
+Scheduler -> Meeting**: Create
+Meeting++
+Scheduler -> Participant**: Create
+Participant++
+Scheduler -> InviteNotification**: Create
+InviteNotification++
+Scheduler -> InviteNotification--: Send
+InviteNotification -> User: Notify
+User --> InviteNotification: Accept/reject
+InviteNotification --> Participant: Update status
+InviteNotification--
+
+==Visit==
+User -> Meeting: Attend
+Meeting -> Participant: Update status
+
+==Cancel==
+Organizer -> Scheduler++: Cancel
+Scheduler -> Meeting!!: Remove
+Meeting --> Participant!!: Remove
+Scheduler -> CancelNotification**: Create
+CancelNotification++
+Scheduler -> CancelNotification--: Send
+CancelNotification -> User--: Notify
+@enduml

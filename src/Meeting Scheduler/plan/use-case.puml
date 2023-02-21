@@ -1,0 +1,24 @@
+@startuml
+left to right direction
+
+actor User
+actor Scheduler
+actor System
+
+Scheduler --> (schedule meeting)
+    (schedule meeting) ..> (book room): include
+    (schedule meeting) ..> (send invite notification): include
+Scheduler --> (cancel meeting)
+    (cancel meeting) ..> (remove meeting from calendar): include
+    (cancel meeting) ..> (release room): include
+    (cancel meeting) ..> (send cancel notification): include
+
+(send invite notification) <-- System
+(send cancel notification) <-- System
+
+User --> (response on invitation)
+    (response on invitation) <.. (accept invitation): extends
+    (response on invitation) <.. (reject invitation): extends
+User --> (attend meeting)
+
+@enduml

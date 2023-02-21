@@ -1,0 +1,61 @@
+@startuml
+class Notification {
+    - notificationId: int
+    - content: string
+    - creationDate: date/time
+    + sendInvite(user)
+    + cancelNotification(user)
+}
+Notification --> User: sent to
+
+class User {
+    - name: string
+    - email: string
+    + respondInvitation(invite)
+}
+User -- Meeting
+
+class Calendar {
+    - meetings: Meeting[]
+}
+Calendar *-- Meeting
+
+class Interval {
+    - startTime: date/time
+    - endTime: date/time
+}
+
+class MeetingRoom {
+    - id: int
+    - capacity: int
+    - bookedIntervals: Interval[]
+    - isAvailable: bool
+}
+MeetingRoom o--> Interval
+
+class Meeting {
+    - id: int
+    - participants: User[]
+    - interval: interval
+    - room: meetingRoom
+    - subject: string
+    + addParticipants(participants: [])
+}
+
+class MeetingScheduler {
+    - organizer: User
+    - calendar: Calendar
+    - rooms: MeetingRoom[]
+    + scheduleMeeting(users[], interval): bool
+    + cancelMeeting(users[], interval): bool
+    + checkRoomsAvailability(numberOfPersons, interval): MeetingRoom
+    + bookRoom(room, numberOfPersons, interval): bool
+    + releaseRoom(room, interval): bool
+}
+MeetingScheduler --> Notification: generates
+MeetingScheduler o-- User
+MeetingScheduler --> Meeting: creates
+MeetingScheduler *--> Calendar
+MeetingScheduler o-- MeetingRoom
+
+@enduml

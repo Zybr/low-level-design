@@ -1,0 +1,10 @@
+@startuml
+start
+:The user receives a meeting;
+if (Response to invite?) then (Accept)
+else (Reject)
+endif
+:The scheduler updates the participants list;
+stop
+
+@enduml

@@ -1,0 +1,89 @@
+@startuml
+class Room {
+    - capacity: int
+    + getCapacity(): int
+}
+
+class TimeInterval {
+    - start: DateTime
+    - end: DateTime
+    + getStart(): DateTime
+    + getEnd(): DateTime
+}
+
+abstract class Notification {
+    - user: User
+    - meeting: Meeting
+    + getMeeting(): Meeting
+    + send()
+}
+Notification <--> User
+Notification o-- Meeting
+
+class InviteNotification extends Notification {
+    + accept()
+    + reject()
+}
+
+class CancelNotification extends Notification {
+}
+
+class User {
+    - username
+    - notifications: Notification[]
+    + getUsername(): string
+    + getInvites(): InviteNotification
+    + notify(notification: Notification)
+    + attend(meeting: Meeting)
+}
+
+class ParticipantStatus {
+    + NOT_RESPONDED
+    + ACCEPTED
+    + REJECTED
+    + ATTENDED
+}
+
+class Participant {
+    - user: User
+    - status: ParticipantStatus
+    + getUser(): User
+    + getStatus(): ParticipantStatus
+}
+Participant o-- User
+Participant *-- ParticipantStatus
+
+class Meeting {
+    - scheduler: Scheduler
+    - room: Room
+    - time: TimeInterval
+    - participants: Participant[]
+    + getRoom(): Room
+    + getTime(): TimeInterval
+    + getParticipants(): Participant[]
+    + invite(user: User)
+    + cancel()
+}
+Meeting *-- Room
+Meeting *-- TimeInterval
+Meeting *-- Participant
+
+class Calendar {
+    - meetings: Meeting[]
+    + getMeetings(): Meeting[]
+    + getUserMeetings(user: User): Meeting[]
+}
+Calendar --> Meeting
+
+class Scheduler {
+    - calendar: Calendar
+    + getCalendar(): Calendar
+    + getFreeRooms(capacity: int, time: TimeInterval): Room[]
+    + book(room: Room, time: TimeInterval, users: User[]): Meeting
+    + cancel(meeting): Meeting
+}
+Scheduler *-- Calendar
+Scheduler --> Notification: send
+Scheduler <..> Meeting: book/cancel
+
+@enduml

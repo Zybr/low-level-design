@@ -1,0 +1,54 @@
+TimeInterval
+    - start: DateTime
+    - end: DateTime
+    + constructor(start: DateInterval, end: DateInterval)
+
+Room
+    - capacity: int
+    + constructor(capacity: int)
+    + getCapacity(): int
+
+Meeting
+    - room: Room
+    - interval: TimeInterval
+    - participants: User[]
+    - acceptedParticipants: User[]
+    - rejectedParticipants: User[]
+    + constructor(room: Room, timeInterval: TimeInterval participants: User[])
+    + getParticipants(): User[]
+    + getAccepted(): User[]
+    + getRejected(): User[]
+    + getRoom(): Room
+    + invite(user: User)
+    + setTime(timeInterval: TimeInterval)
+    + cancel()
+
+User
+    - username: string
+    - invitations: Invitation[] = []
+    + constructor(username: string)
+    + notify(invitation)
+    + getInvitations(): Invitations[]
+
+Invitation
+    - user: User
+    - meeting: Meeting
+    + constructor(user: User, meeting: Meeting)
+    + accept()
+    + reject()
+    + send()
+
+Calendar
+    - meetings
+    + getMeetings(): Meeting[]
+    + getUserInvitedMeetings(user: User): Meeting[]
+    + getUserAcceptedMeetings(): Meeting[]
+
+Scheduler
+    - rooms
+    - users
+    - calendar
+    + getCalendar()
+    + getUsers(): Users[]
+    + getRooms(): Rooms[]
+    + bookMeeting(room: Room, time: TimeInterval, participants: User[]): Meeting

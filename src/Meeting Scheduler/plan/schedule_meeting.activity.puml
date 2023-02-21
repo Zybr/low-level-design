@@ -1,0 +1,20 @@
+@startuml
+start
+:The user selects a date and interval;
+:The scheduler checks the calendar;
+:Add number of participants for the meeting;
+while (The scheduler selects a room)
+    switch (Room status:)
+        case (Available)
+            :Room successfully booked;
+            :The calendar is updated;
+            :Notification and meeting details sent to all invite recipients;
+            stop
+        case (Blocked)
+        case (Out of order)
+        case (insufficient capacity)
+    endswitch
+endwhile
+-[hidden]->
+
+@enduml
