@@ -1,0 +1,204 @@
+@startuml
+class TimeInterval {
+    - start: DateTime
+    - end: DateTime
+    + constructor (start, end)
+    + getStart(): DateTime
+    + getEnd(): DateTime
+}
+
+enum Genre {
+    + HORROR
+    + THRILLER
+    + SCIENCE_FICTION
+    + WESTERN
+    + COMEDY
+    + DRAMA
+}
+
+enum Language {
+    + ENGLISH
+    + FRENCH
+    + GERMAN
+    + IRISH
+    + ITALIAN
+    + POLISH
+    + PORTUGUESE
+    + SPANISH
+}
+
+class Movie {
+    + title: string
+    + genre: Genre
+    + release: Date
+    + language: Language
+    + constructor(title, genre, release, language)
+}
+Movie *-- Language: has
+Movie *-- Genre: has
+
+class Show {
+    - cinema: Cinema
+    - hall: Hall
+    - movie: Movie
+    - time: TimeInterval
+    + constructor(hall, movie, time, silverPrice, goldPrice, platinumPrice)
+
+    + getSilverPrice(): number
+    + getGoldPrice(): number
+    + getPlatinumPrice(): number
+
+    + getHall(): Hall
+    + getMovie(): Movie
+    + getTime(): TimeInterval
+
+    + setTime(time)
+}
+Show --> Hall: placed in
+Show --> Movie: shows
+Show *-- TimeInterval: lasts
+
+enum SeatType {
+    + SILVER
+    + GOLD
+    + PLATINUM
+}
+
+class Seat {
+    - num: number
+    - type: SeatType
+    + constructor(num, type)
+    + getNumber(): number
+    + getType(): SeatType
+}
+Seat *-- SeatType: has
+
+class Hall {
+    - seats: Seat
+    + constructor(silverNum, goldNum, platinumNum)
+    + getSeat(): Seat[]
+}
+Hall *-- Seat: has
+
+class Cinema {
+    - halls: Hall[]
+    - shows: Show[]
+    + getHalls(): Hall[]
+    + createShow(hall, movie, time): Show
+    + removeShow(show)
+    + getShows(): Show[]
+}
+Cinema *-- Hall: has
+Cinema <-[#red]-> Show: has
+
+class Booking {
+    - show: Show
+    - seat: Seat
+    + constructor(show, seat)
+    + getShow(): Show
+    + getSeat(): Seat
+    + getPrice(): number
+}
+Booking --> Show: of
+Booking --> Seat: of
+
+class Ticket {
+    - booking: Booking
+    + getBooking(): Booking
+}
+Ticket --> Booking: of
+
+class MoveFilter {
+    + title: string
+    + genre: Genre
+    + release: Date
+    + language: Language
+}
+
+class BookingSystem {
+    - movies: Movie[]
+    - bookings: Booking[]
+    - cinema: Cinema[]
+    - money: number
+    + addMovie(movie)
+    + removeMovie(movie)
+    + getMovies(filter): Movie[]
+    + getMovieShows(movie): Shows[]
+
+    + getFreeSeats(show): Seat[]
+    + getPrice(show, seat): money
+    + book(show, seat, money): Ticket
+    + cancel(ticket): number
+
+    + getMoney(): number
+}
+BookingSystem --> Movie: has
+BookingSystem *-- Booking: has
+BookingSystem --> Cinema: uses
+BookingSystem ..> Ticket: creates
+BookingSystem ..> MoveFilter: use for search
+note left of BookingSystem::cancel
+ get money back
+end note
+BookingSystem::addMovie ..> Notification: on: \n addMovie() \n book() \n cancel()
+
+class User {
+    - tickets: Ticket[]
+    - money: number
+    + getTickets(): Ticket[]
+    + addTicket(ticket)
+    + removeTicket(ticket)
+
+    + getMoney(): number
+    + subtractMoney(money)
+    + addMoney(money)
+}
+User *-- Ticket: has
+User ..> BookingSystem: searches/books
+User ..> Agent: asks to book
+
+class Admin {
+}
+Admin ..> BookingSystem: addMovie()\n removeMovie()
+Admin ..> Cinema: createShow()\n removeShow()
+Admin ..> Show: setTime()
+
+class Agent {
+}
+Agent ..> BookingSystem: book()
+
+together {
+    abstract Notification
+    class NewMovieNotification
+    class BookedNotification
+    class CanceledNotification
+}
+
+abstract class Notification {
+    - user: User
+    - text: string
+    + constructor(text)
+    + getText(): string
+    + send()
+}
+Notification --> User: sends to
+
+class NewMovieNotification extends Notification {
+    - movie: Movie
+    + getMovie(): Movie
+}
+NewMovieNotification --> Movie: about
+
+class BookedNotification extends Notification {
+    - ticket: Ticket
+    + getTicket(): Ticket
+}
+BookedNotification --> Ticket: book info
+
+class CanceledNotification extends Notification {
+    - ticket: Ticket
+    + getTicket(): Ticket
+}
+CanceledNotification --> Ticket: book info
+
+@enduml

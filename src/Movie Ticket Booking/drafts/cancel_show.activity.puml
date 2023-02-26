@@ -1,0 +1,32 @@
+@startuml
+actor Admin
+participant BookingSystem
+participant Cinema
+participant Show
+participant Booking
+participant Payment
+participant Notification
+actor User
+
+Admin -> BookingSystem++: cancelShow(Show)
+BookingSystem -> BookingSystem: get bookings of Show
+loop for each booking
+BookingSystem -> Booking++: getPayment()
+BookingSystem <-- Booking--: return Payment
+BookingSystem -> Payment++: refund()
+Payment -> Payment: status = Refunded
+Payment--
+BookingSystem -> Payment++: getMoney()
+BookingSystem <-- Payment--: return money
+BookingSystem -> User: setMoney(+money)
+BookingSystem -> Notification**: create
+Notification++
+BookingSystem -> Notification: send(User)
+Notification -> User: send
+Notification--
+BookingSystem -> Booking!!: remove
+end loop
+
+BookingSystem -> Cinema++: removeShow(Show)
+Cinema -> Show!!: remove
+@enduml

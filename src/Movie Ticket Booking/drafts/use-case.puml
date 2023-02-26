@@ -1,0 +1,42 @@
+@startuml
+left to right direction
+
+actor Customer
+actor Admin
+actor System
+
+'package Booking {
+    (Add show) <-- Admin
+        (Add show) ..> (Send "new" notification): includes
+    (Delete show) <-- Admin
+    (Update show) <-- Admin
+    (Add movie) <-- Admin
+        (Add movie) ..> (Send "new" notification): includes
+        (Add movie) ..> (? Define time/schedule): includes
+    (Delete movie) <-- Admin
+
+    Customer --> (See shows & movies)
+    Customer --> (Receive "new" notification)
+    Customer --> (Receive "booked" notification)
+    Customer --> (By ticket)
+        (By ticket) ..> (Choose cinema): includes
+        (By ticket) ..> (Choose hall): includes
+        (By ticket) ..> (Choose show/movie): includes
+        (By ticket) ..> (Choose showtime): includes
+        (By ticket) ..> (Choose seat): includes
+        (By ticket) ..> (Pay): includes
+            (Pay) ..> (Book seat): includes
+                (Book seat) ..> (Send "booked" notification): includes
+    (Book seat) <-- System
+
+
+    (Send "new" notification) <-- System
+    (Send "booked" notification) <-- System
+
+    note "Inform user" as InformUser
+    (Send "new" notification) ..> InformUser
+    InformUser ..> (Receive "new" notification)
+    (Send "booked" notification) ..> InformUser
+    InformUser ..> (Receive "booked" notification)
+'}
+@enduml

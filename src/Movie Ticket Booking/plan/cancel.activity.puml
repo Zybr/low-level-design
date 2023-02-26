@@ -1,0 +1,15 @@
+@startuml
+start
+:Admin searches a movie title;
+:Admin clicks the appropriate movie;
+:Admin selects the show they want to delete;
+:Admin deletes show;
+:Cancellation notification email is sent to all users who make a booking of that show;
+if (User confirms refund) then (yes)
+    :Users payment status is ste as refunded;
+else (no)
+    :User payment is ste as pending;
+endif
+
+stop
+@enduml

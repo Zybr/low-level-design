@@ -1,0 +1,22 @@
+@startuml
+actor User
+participant BookingSystem
+participant Booking
+participant Payment
+participant Notification
+
+User -> BookingSystem++: cancel (Booking)
+BookingSystem -> Booking++: getPayment()
+BookingSystem <-- Booking--: return Payment
+BookingSystem -> Payment++: refund()
+Payment -> Payment--: status = refunded
+BookingSystem -> Payment++: getMoney()
+BookingSystem <-- Payment--: return moeney
+BookingSystem -> Booking!!: remove
+BookingSystem -> Notification**: create
+Notification++
+Notification -> User--: send(User)
+User <-- BookingSystem--: return money
+
+
+@enduml

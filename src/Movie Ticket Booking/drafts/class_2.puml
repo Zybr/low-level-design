@@ -1,0 +1,195 @@
+@startuml
+class Movie {
+    - title: string
+    - duration: number
+    - genre: string
+    - release: Date
+    - language: string
+}
+
+class Show {
+    - cinema: Cinema
+    - hall: Hall
+    - movie: Movie
+    - startTime: DateTime
+
+    - silverCost: money
+    - goldCost: money
+    - platinumCost: money
+
+    + setTime(time)
+}
+Show --> Hall: placed in
+Show --> Movie: shows
+
+class Seat {
+    - num: number
+}
+
+class SilverSeat extends Seat {
+}
+
+class GoldSeat extends Seat {
+}
+
+class PlatinumSeat extends Seat {
+}
+
+class Hall {
+    - seats: Seat
+}
+Hall *-- Seat: has
+
+class Cinema {
+    - halls: Hall[]
+    - shows: Show[]
+    + createShow(hall, movie, time): Show
+    + removeShow(show)
+}
+Cinema *-- Hall: has
+Cinema <-[#red]-> Show: has
+
+enum PaymentStatus {
+    + PENDING
+    + CONFIRMED
+    + REFUNDED
+}
+
+class Payment {
+    - money: int
+    - status: PaymentStatus
+    + pay(money): bool
+    + refund()
+}
+Payment *-- PaymentStatus
+
+class CachePayment extends Payment {
+}
+
+class CardPayment extends Payment {
+}
+
+class Booking {
+    - show: Show
+    - seat: Seat
+    - payment: Payment | null
+    + confirm(payment): Ticket
+    + isBooked(): bool
+}
+Booking --> Show: of
+Booking --> Seat: of
+Booking o-- Payment
+
+class Ticket {
+    - booking: Booking
+}
+Ticket --> Booking: of
+
+class Catalog {
+    - movies: Movie[]
+    + addMovie(movie)
+    + removeMovie(movie)
+    + findMovies(filter): Movie[]
+}
+Catalog o-- Movie
+Catalog ..> MoveFilter: uses for search
+Catalog::addMovie ..> Notification: on: \n addMovie()
+
+class MoveFilter {
+    + title: string
+    + genre: Genre
+    + release: Date
+    + language: Language
+}
+
+class BookingSystem {
+    - catalog: Catalog
+    - cinema: Cinema[]
+    - bookings: Booking[]
+    + getShows(movie): Shows[]
+    + getFreeSeats(show): Seat[]
+    + getCost(show, seat): money
+
+    + book(show, seat): Booking
+    + cancel(ticket): money
+
+    + cancelShow(show)
+}
+BookingSystem --> Movie: has
+BookingSystem *-- Booking: has \n create
+BookingSystem --> Cinema: has
+BookingSystem ..> Notification: send on: \n book() \n cancel()
+BookingSystem ..> Show: find by
+BookingSystem ..> Seat: find by
+note left of BookingSystem::cancel
+ get money back
+end note
+
+class Address {
+    - country: string
+    - state: string
+    - city: string
+    - zipCode: string
+}
+
+abstract class Person {
+    - name: string
+    - email: string
+    - address: Address
+}
+Person *-- Address
+
+class User extends Person {
+    - tickets: Ticket[]
+    - money: number
+    - notifications: Notification[]
+    + addTicket(ticket)
+    + removeTicket(ticket)
+    + setMoney(money)
+    + notify(notification)
+}
+User *-- Ticket: has
+User ..> BookingSystem: searches/books
+User ..> Agent: asks to book
+
+class Admin extends Person {
+}
+Admin ..> BookingSystem: addMovie()\n removeMovie() \n cancelShow()
+Admin ..> Cinema: createShow()
+Admin ..> Show: setTime()
+
+class Agent extends Person {
+    + book(show, seat): Booking
+}
+Agent ..> BookingSystem: book()
+
+together {
+    abstract Notification
+    class NewMovieNotification
+    class BookedNotification
+    class CanceledNotification
+}
+
+abstract class Notification {
+    - user: User
+    - text: string
+    + send()
+}
+Notification --> User: sends to
+
+class NewMovieNotification extends Notification {
+    - movie: Movie
+}
+NewMovieNotification --> Movie: about
+
+class BookedNotification extends Notification {
+    - ticket: Ticket
+}
+BookedNotification --> Ticket: book info
+
+class CanceledNotification extends Notification {
+    - ticket: Ticket
+}
+CanceledNotification --> Ticket: book info
+
+@enduml

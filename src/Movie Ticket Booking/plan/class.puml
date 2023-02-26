@@ -1,0 +1,189 @@
+@startuml
+abstract class Notification {
+    - id: int
+    - createdAt: DateTime
+    - content: string
+    + sendNotification(person)
+}
+
+class PhonedNotification extends Notification {
+}
+
+class EmailNotification extends Notification {
+}
+
+enum SeatStatus {
+    + AVAILABLE
+    + BOOKED
+    + RESERVED
+}
+
+abstract class Seat {
+    - num: int
+    - status: SeatStatus
+    + isAvailable(): bool
+    + setSeat()
+    + setRate()
+}
+Seat *--> SeatStatus
+
+class SilverSeat extends Seat {
+}
+
+class GoldSeat extends Seat {
+}
+
+class PlatinumSeat extends Seat {
+}
+
+class Hall {
+    - id: int
+    - shows: ShowTime[]
+    + getCurrentShows(): ShowTime[]
+}
+Hall *-- ShowTime
+
+class Cinema {
+    - id: int
+    - halls: Hall[]
+    - city: City
+}
+Cinema *-- Hall
+
+class City {
+    - name: string
+    - state: string
+    - zipCode: string
+    - cinemas: Cinema[]
+}
+City <-[#red]-> Cinema
+
+enum PaymentStatus {
+    + PENDING
+    + CONFIRMED
+    + DECLINED
+    + REFUNDED
+}
+
+abstract class Payment {
+    - amount: double
+    - status: PaymentStatus
+    - createdAt: DateTime
+    + makePayment()
+}
+Payment *-- PaymentStatus
+Payment -- Booking
+note left of Payment::makePayment()
+?
+end note
+
+class CreditPayment extends Payment {
+    - nameOnCard: string
+    - cardNumber: string
+    - code: int
+    - billingAddress: Address
+}
+
+class CachePayment extends Payment {
+}
+
+abstract class Person {
+    - name: string
+    - address: Address
+    - email: string
+    - phone: string
+}
+
+class Admin extends Person {
+    + addShow(show): bool
+    + updateShow(show): bool
+    + deleteShow(show): bool
+    + addMovie(movie): bool
+    + deleteMovie(movie): bool
+}
+Admin --> Notification
+Admin --> ShowTime
+Admin --> Movie
+
+class Customer extends Person {
+    - bookings: Booking []
+    + createBooking(booking): bool
+    + updateBooking(booking): bool
+    + deleteBooking(booking): bool
+}
+Customer --> Booking
+
+class TicketAgent extends Person {
+    + createBooking(booking): bool
+}
+TicketAgent --> Booking
+
+interface Search {
+    + searchMovieTitle(title): Movie[]
+    + searchMovieLanguage(language): Movie[]
+    + searchMovieGenre(genre): Movie[]
+    + searchMovieReleaseDate(releaseDate): Movie[]
+}
+
+class Catalog implements Search {
+    - movieTitle: Map<string, Movie[]>
+    - movieLanguage: Map<string, Movie[]>
+    - movieGenre: Map<string, Movie[]>
+    - movieReleaseDate: Map<string, Movie[]>
+    + updateMovieCatalog(**arg)
+}
+Catalog o-- Movie: contains
+
+class Movie {
+    - title: string
+    - genre: string
+    - releaseDate: DateTime
+    - language: string
+    - duration: int
+    - shows: ShowTime[]
+}
+Movie --> ShowTime
+
+class MovieTicket {
+    - id: int
+    - seat: Seat
+    - movie: Movie
+    - shows: ShowTime
+}
+MovieTicket --> Movie
+MovieTicket --> ShowTime
+
+class ShowTime {
+    - id: int
+    - startTime: dateTime
+    - date: DateTime
+    - duration: int
+    - seats: Seat[]
+    + showAvailableSeats(): void
+}
+ShowTime --> Seat
+note left of ShowTime::showAvailableSeats
+how show?
+end note
+
+enum BookingStatus {
+    + PENDING
+    + CONFIRMED
+    + CANCELED
+    + DENIED
+    + REFUNDED
+}
+
+class Booking {
+    - id: int
+    - amount: int
+    - totalSeats: int
+    - createdAt: DateTime
+    - status: BookingStatus
+}
+Booking --> ShowTime
+Booking --> MovieTicket
+Booking --> Seat
+Booking *--> BookingStatus
+
+@enduml

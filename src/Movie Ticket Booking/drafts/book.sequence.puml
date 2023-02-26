@@ -1,0 +1,44 @@
+@startuml
+actor User
+participant BookingSystem
+participant Catalog
+participant Booking
+participant Payment
+participant Ticket
+participant Notification
+
+== Choose movie ==
+
+User -> BookingSystem++: getCatalog()
+User <-- BookingSystem--: return catalog
+User -> Catalog++: findMovies()
+User <-- Catalog--: Movie[]
+User -> BookingSystem++: getShows(Movie)
+User <-- BookingSystem--: Show[]
+User -> BookingSystem++: getFreeSeats(Show)
+User <-- BookingSystem--: Seat[]
+User -> BookingSystem++: getCost(Show, Seat)
+User <-- BookingSystem--: cost
+
+== Book ==
+
+User -> BookingSystem++: book(Show, Seat)
+BookingSystem -> Booking**: create
+Booking++
+Booking -> Booking--: is not booked
+User <-- BookingSystem--: return Booking
+User -> Payment**: create
+Payment++
+Payment -> Payment--: status = pending
+User -> Payment++: pay()
+Payment -> Payment--: status = confirmed
+User -> Booking++: confirm(Pay)
+Booking -> Booking: is booked
+Booking -> Ticket**: create
+Booking -> Notification**
+Notification++
+Notification -> User--: send(User)
+User <-- Booking--: return Ticket
+
+
+@enduml

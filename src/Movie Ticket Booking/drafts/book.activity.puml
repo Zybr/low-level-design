@@ -1,0 +1,16 @@
+@startuml
+start
+
+while (is Movie chosen?) is (no)
+    :get Catalog;
+    :find Movie;
+while end
+while (is Seat chosen?) is (no)
+    :choose Show;
+    :choose Seat;
+while end
+:book Seat of Show;
+:pay Payment;
+:attache Payment to the Booking;
+:receive a ticket;
+@enduml

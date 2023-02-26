@@ -1,0 +1,40 @@
+@startuml
+start
+repeat
+    :Customer searches for a movie;
+    fork
+        :By title;
+    fork again
+        :By language;
+    fork again
+        :By release date;
+    fork again
+        :By genre;
+    fork end
+    backward: Inform customer of the unavailability;
+repeat while (Is move available?) is (no)
+->yes;
+
+:Customer selects an available show;
+:Customer selects and available seat type;
+fork
+    :Silver;
+fork again
+    :Gold;
+fork again
+    :Platinum;
+fork end
+
+repeat
+    :Customer select a payment method;
+    fork
+        :Customer insert credit card;
+    fork again
+        :Customer pays cash;
+    fork end
+repeat while (Transaction is successful?) is(no)
+->yes;
+:System sends a success message;
+:Customer receives the movie ticket;
+stop
+@enduml

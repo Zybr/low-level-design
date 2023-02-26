@@ -1,0 +1,44 @@
+@startuml
+left to right direction
+
+actor Customer
+actor TicketAgent
+actor System
+actor Admin
+
+Customer --> (View booking)
+Customer --> (Search movie)
+    (Search movie) <|-- (By movie title)
+    (Search movie) <|-- (By movie genre)
+    (Search movie) <|-- (By movie release date)
+    (Search movie) <|-- (By movie release language)
+Customer --> (Create booking)
+    (Create booking) ..> (Reserve seat)
+Customer --> (Reserve seat)
+Customer --> (Pay using cash)
+    (Pay using cash) ..> (Send booking notification)
+Customer --> (Pay using credit card)
+    (Pay using credit card) ..> (Send booking notification)
+Customer --> (Cancel booking)
+    (Cancel booking) ..> (Send cancellation notification)
+    (Cancel booking) ..> (Refund payment)
+Customer --> (Modify booking)
+
+(View booking) <-- TicketAgent
+(Search movie) <-- TicketAgent
+(Reserve seat) <-- TicketAgent
+(Create booking) <-- TicketAgent
+
+(Send booking notification) <-- System
+(Send cancellation notification) <-- System
+(Send new movie notification) <-- System
+
+(Delete show) <-- Admin
+(Delete movie) <-- Admin
+    (Delete show) ..> (Send cancellation notification)
+(Add movie) <-- Admin
+    (Add movie) ..> (Send new movie notification)
+(Add show) <-- Admin
+(Modify show) <-- Admin
+
+@enduml
