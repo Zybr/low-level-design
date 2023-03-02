@@ -1,0 +1,24 @@
+@startuml
+actor Customer
+actor Person
+participant Reservation
+participant Payment
+
+Customer -> Reservation++: cancel()
+Customer++
+alt Reservation.status = PENDING
+    Reservation -> Payment++: refund()
+    Payment--
+    destroy Payment
+    Reservation -> Customer: getPerson()
+    Reservation <-- Customer: return Person
+    Reservation -> Person++: addMoney(Payment.getAmount())
+    Person--
+    Customer--
+    Reservation--
+else
+    Customer <-- Reservation: reservation can't be canceled
+end
+
+
+@enduml

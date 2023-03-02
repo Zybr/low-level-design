@@ -1,0 +1,328 @@
+@startuml
+
+abstract class Notification {
+    - reservation: Reservation
+}
+Notification --> Reservation: is about
+
+class ReservationNotification extends Notification {
+}
+
+class CancelingNotification extends Notification {
+}
+
+class OverdueNotification extends Notification {
+}
+
+interface CostInterface {
+    + getAmount(): number
+}
+
+class Cost implements CostInterface {
+    - amount
+    - reservation
+}
+
+class DiscountCost implements CostInterface {
+    + constructor(cost, discountPercent)
+}
+
+class DamageCost implements CostInterface {
+    + constructor(cost, damagePercentage)
+}
+
+class Fuel implements CostInterface {
+    + constructor(cost, fuelValue)
+}
+
+enum PaymentStatus {
+    + PENDING
+    + PAYED
+    + REFUND
+}
+
+abstract class Payment {
+    - amount: int
+    - status: PaymentStatus
+    + pay(amount)
+    + refund()
+}
+Payment *-- PaymentStatus
+
+class CashPayment extends Payment {
+}
+
+class CardPayment extends Payment {
+
+}
+
+class ChequePayment extends Payment {
+}
+
+
+enum ActionType {
+    + ACCIDENT
+    + FUELING
+    + CLEANING
+    + OIL_CHANGE
+    + REPAIR
+    + OTHER
+}
+
+class Action {
+    - type: ActionType
+    - time: DateTime
+}
+Action *-- ActionType
+
+class History {
+    + log(actionType)
+}
+History *-- Action
+
+
+abstract class Vehicle {
+    - licenseNumber: string
+    - model: string
+    - price: int
+    - isFree: bool
+    - history: History
+    + setFree(isFree)
+}
+Vehicle *-- History
+
+enum VanType {
+    + PASSENGER
+    + CARGO
+}
+
+abstract class Van extends Vehicle {
+    - type: VanType
+}
+Van *-- VanType
+
+enum MotorcycleType {
+    + CRUISER
+    + TOURING
+    + SPORT
+}
+
+class Motorcycle extends Vehicle {
+    - type: MotorcycleType
+}
+Motorcycle *-- MotorcycleType
+
+enum CarType {
+    + ECONOMY
+    + LUXURY
+    + STANDARD
+    + COMPACT
+}
+
+class Car extends Vehicle {
+    - type: CarType
+}
+Car *-- CarType
+
+enum TruckType {
+    + LIGHT
+    + MEDIUM
+    + HIGH_DUTY
+}
+
+class Truck extends Vehicle {
+    - type: TruckType
+}
+Truck *-- TruckType
+
+class Park {
+    - byNumber: <licenseNumber: string, Vehicle>
+    - byModel: <type: string, Vehicle>
+    + addVehicle(vehicle)
+    + getVehicle(licenseNumber)
+    + findVan(model?): Van[]
+    + findMotorcycle(model?): Motorcycle[]
+    + findCar(model?): Car[]
+    + findTruck(model?): Truck[]
+}
+Park o-- Vehicle: has
+
+abstract class Equipment {
+    - price: int
+}
+
+class Navigation extends Equipment {
+}
+
+class SkiRack extends Equipment {
+}
+
+class ChildSeat extends Equipment {
+}
+
+'class EquipmentsList {
+'    - equipments: Equipment
+'    + getEquipments(): Equipment
+'    + addEquipment(equipment)
+'}
+'EquipmentsList o-- Equipment
+
+
+abstract class Service {
+    - price: int
+}
+
+class Driver extends Service {
+}
+
+class WiFi extends Service {
+}
+
+class RoadsideAssistant extends Service {
+}
+
+'class ServicesList {
+'    - services: Service[]
+'    + getServices(): Service[]
+'    + addService(service)
+'}
+'ServicesList o-- Service
+
+
+class Address {
+    - country: string
+    - state: string
+    - city: string
+    - zipCode: string
+}
+
+class Location {
+    - address: Address
+}
+Location o-- Address: located
+
+
+class Person {
+    - name: string
+    - address: Address
+    - phone: string
+    - money: int
+    + addMoney(money)
+    + subtractMoney(money)
+}
+Person --> Address: located
+
+enum UserStatus {
+    + active
+    + canceled
+}
+
+abstract class User {
+    - person: Person
+    - status: UserStatus
+    - username: string
+    - password: string
+    - notifications: Notification
+    - reservations: Reservation[]
+    + resetPassword(oldPassword, newPassword)
+    + cancel()
+    + notify(notification)
+
+    + getReservations(): Reservation[]
+    + addReservation(reservation?): Reservation
+
+    + pickupVehicle(): Vehicle
+    + dropVehicle()
+}
+User *-- Person: belongs
+User *-- UserStatus: has
+User *-- Reservation: has / create
+User --> Notification: receives
+User ..> RentalSystem: use
+User ..> Park: choose vehicle
+
+class Customer extends User {
+}
+
+class Receptionist extends User {
+    + addVehicle(vehicle)
+    + addLog(licenseNumber, actionType)
+    + getVehicle(licenseNumber): Vehicle
+}
+Receptionist ..> Park: manages
+
+class Authorization {
+    - user: <username, User>
+    + login(username, password): User
+    + registerCustomer(person, username, password): Customer
+    + registerReceptionist(person, username, password): Receptionist
+}
+Authorization o-- User: has
+
+enum ReservationStatus {
+    + PENDING
+    + CONFIRMED
+    + CANCELED
+    + ACTIVE
+    + DONE
+    + PAYED
+}
+
+class Reservation {
+    - vehicle: Vehicle
+    - services: Service[]
+    - equipment: Equipment
+    - startTime: DateTime
+    - endTime: DateTime
+    - payment: Payment
+    - status: ReservationStatus
+
+    + setVehicle(vehicle): this
+    + setServices(services): this
+    + setEquipments(equipments): this
+    + setStartBranch(branch): this
+    + setEndBranch(branch): this
+    + setPeriod(startTime, endTime): this
+
+    + getCost(): int
+    + confirm(): this
+    + cancel()
+    + pay(payment)
+}
+Reservation o-- Vehicle: of
+Reservation *-- Equipment: has
+Reservation *-- Service: has
+Reservation o-- RentalBranch: pickups / returns at
+Reservation *-- ReservationStatus: has
+Reservation ..> Payment: pay()
+
+
+class ParkingStall {
+    - vehicle: Vehicle | null
+    + isFree(): bool
+    + dropVehicle(car)
+    + pickupVehicle(): Car
+}
+ParkingStall o-- Vehicle: has
+
+class RentalBranch {
+    - location: Location
+    - stalls: ParkingStall
+    + getStall(serialNumber): ParkingStall
+    + getFreeStalls(): ParkingStall
+    + addStall(stall)
+}
+RentalBranch o-- Location
+RentalBranch o-- ParkingStall
+
+class RentalSystem {
+    - branches: RentalBranch
+    - services: Service[]
+    - equipment: Equipment[]
+    + addBranch(branch)
+}
+RentalSystem *-- RentalBranch: has
+RentalSystem o-- Service: provides
+RentalSystem o-- Equipment: provides
+
+@enduml

@@ -1,0 +1,82 @@
+@startuml
+actor Customer
+participant RentalSystem
+participant RentalBranch
+participant Park
+participant Reservation
+participant Payment
+participant ParkingStall
+participant Vehicle
+
+Customer++
+Customer -> Park++: findCar()
+Customer <-- Park--: return cars
+Customer -> Customer: choose a car
+
+Customer -> RentalSystem++: getServices()
+Customer <-- RentalSystem--: return services
+Customer -> Customer: choose services
+
+Customer -> RentalSystem++: getEquipments()
+Customer <-- RentalSystem--: return equipments
+Customer -> Customer: choose equipments
+
+Customer -> RentalSystem++: getBranches()
+Customer <-- RentalSystem--: return branches
+Customer -> RentalBranch++: getLocation()
+Customer <-- RentalBranch--: return location
+Customer -> Customer: choose location
+
+Customer -> Reservation**: addReservation()
+Reservation -> Reservation++: status = PENDING
+Reservation--
+Customer -> Reservation++: setVehicle()
+Reservation--
+Customer -> Reservation++: setServices()
+Reservation--
+Customer -> Reservation++: setEquipments()
+Reservation--
+Customer -> Reservation++: setEquipments()
+Reservation--
+Customer -> Reservation++: setStartLocation()
+Reservation--
+Customer -> Reservation++: setEndLocation()
+Reservation--
+Customer -> Reservation++: setPeriod()
+Reservation--
+
+
+Customer -> Payment**: create
+Payment++
+Customer -> Payment: pay(Reservation.getCost())
+Customer -> Reservation++: confirm(Payment)
+Reservation -> Vehicle++: status = NOT FREE
+Vehicle--
+Reservation -> Reservation: status = CONFIRMED
+Payment--
+Reservation--
+
+Customer -> RentalBranch++: getStall(vehicle.serialNumber)
+Customer <-- RentalBranch--: return ParkingStall
+
+Customer -> ParkingStall++: pickupVehicle()
+ParkingStall -> Reservation: status = ACTIVE
+{start} Customer <-- ParkingStall--: return Vehicle
+ParkingStall--
+Customer -> Vehicle++: use
+Vehicle--
+{end} Customer -> RentalBranch++: getFreeStalls()
+{start} <-> {end}: use vehicle
+
+Customer <-- RentalBranch--: return ParkingStall[]
+Customer -> Customer: choose a ParkingStall
+Customer -> ParkingStall++: dropVehicle(vehicle)
+ParkingStall -> Reservation: getVehicle()
+note right: (?) Check access to the vehicle
+ParkingStall <-- Reservation: return Vehicle
+ParkingStall -> Vehicle++: status = FREE
+ParkingStall -> Reservation!!: status = DONE
+ParkingStall--
+Vehicle--
+
+@enduml

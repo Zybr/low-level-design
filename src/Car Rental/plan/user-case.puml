@@ -1,0 +1,48 @@
+@startuml
+left to right direction
+
+actor Member
+actor System
+actor Receptionist
+
+Member --> (Search vehicle inventory)
+Member --> (Create a new account)
+Member --> (Update/cancel account)
+Member --> (Login/Logout)
+Member --> (Make a reservation)
+Member --> (Cancel reservation)
+Member --> (Update reservation)
+Member --> (Return vehicle)
+    (Return vehicle) ..> (Pay bill)
+Member --> (Pay bill)
+Member --> (Pickup vehicle)
+
+(Search vehicle inventory) <-- Receptionist
+(Create a new account) <-- Receptionist
+(Update/cancel account) <-- Receptionist
+(Login/Logout) <-- Receptionist
+(Make a reservation) <-- Receptionist
+(Cancel reservation) <-- Receptionist
+(Update reservation) <-- Receptionist
+(Add vehicle) <-- Receptionist
+    (Add car) --|> (Add vehicle)
+    (Add van) --|> (Add vehicle)
+    (Add truck) --|> (Add vehicle)
+    (Add motorbike) --|> (Add vehicle)
+(Remove vehicle) <-- Receptionist
+    (Remove van) --|> (Remove vehicle)
+    (Remove truck) --|> (Remove vehicle)
+    (Remove car) --|> (Remove vehicle)
+    (Remove motorbike) --|> (Remove vehicle)
+(Modify vehicle) <-- Receptionist
+    (Modify car) --|> (Modify vehicle)
+    (Modify van) --|> (Modify vehicle)
+    (Modify motorbike) --|> (Modify vehicle)
+    (Modify truck) --|> (Modify vehicle)
+(Update log) <-- Receptionist
+
+(Reservation canceled notification) <-- System
+(send reservation notification) <-- System
+(Overdue notification) <-- System
+
+@enduml

@@ -1,0 +1,71 @@
+@startuml
+left to right direction
+actor Customer
+actor System
+actor Receptionist
+
+Customer --> (register)
+    (register) ..> (store data)
+        (store data) ..> (name)
+        (store data) ..> (address)
+        (store data) ..> (phone number)
+
+Customer --> (search a car)
+    (search a car) <|-- (by type)
+    (search a car) <|-- (by model)
+
+Customer --> (reserve a car)
+    (reserve a car) ..> (choose a car)
+        (choose a car) ..> (by type)
+            (by type) <|-- (car)
+                (car) <|-- (economy)
+                (car) <|-- (luxury)
+                (car) <|-- (standard)
+                (car) <|-- (compact)
+            (by type) <|-- (truck)
+                (truck) <|-- (light)
+                (truck) <|-- (medium)
+                (truck) <|-- (high-duty)
+            (by type) <|-- (van)
+                (van) <|-- (passenger)
+                (van) <|-- (cargo)
+            (by type) <|-- (motorcycle)
+                (motorcycle) <|-- (cruiser)
+                (motorcycle) <|-- (touring)
+                (motorcycle) <|-- (sport)
+        (choose a car) ..> (by model)
+    (reserve a car) ..> (add equipment)
+        (add equipment) <|-- (ski rack)
+        (add equipment) <|-- (child seat)
+        (add equipment) <|-- (navigation)
+    (reserve a car) ..> (add service)
+        (add service) <|-- (driver)
+        (add service) <|-- (wi-fi)
+        (add service) <|-- (roadside assistance)
+    (reserve a car) ..> (choose pickup place)
+    (reserve a car) ..> (define rent time)
+        (define rent time) ..> (start date-time)
+        (define rent time) ..> (end date-time)
+    (reserve a car) ..> (choose drop place)
+    (reserve a car) ..> (pay rent)
+        (pay rent) <|-- (by cash)
+        (pay rent) <|-- (by card)
+        (pay rent) <|-- (by cheque)
+        (pay rent) ..> (create a log)
+            (create a log) ..> (customer)
+            (create a log) ..> (issue date)
+
+Customer --> (cancel reservation)
+    (cancel reservation) ..> (update a log)
+
+Customer --> (pickup card)
+
+Customer --> (drop car)
+    (drop car) <|-- (pay fine)
+
+(store data) <-- System
+(charge fine) <-- System
+(create a log) <-- System
+(update a log) <-- System
+(send notification) <-- System
+@enduml

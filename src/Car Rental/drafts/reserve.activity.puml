@@ -1,0 +1,31 @@
+@startuml
+start
+
+:Customer finds car;
+repeat
+:Customer chooses car;
+repeat while (is there appropriate vehicle?) is (no)
+:Customer chooses services;
+:Customer chooses equipments;
+:Customer chooses time period;
+:Customer chooses start location;
+:Customer chooses end location;
+:Customer creates reservation;
+repeat
+:Customer creates payment;
+:Customer confirms reservation by payment;
+repeat while (is reservation confirmed?) is (no)
+:Customer pick vehicle;
+:Customer drive vehicle;
+:Customer drop vehicle;
+if (is period overdue?) is (yes) then
+    :Customer receive fine;
+    repeat
+        :Customer creates payment;
+        :Customer confirms fine by payment;
+    repeat while (is fine confirmed?) is (no)
+else (no)
+endif
+
+stop
+@enduml
