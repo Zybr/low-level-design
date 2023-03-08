@@ -1,0 +1,45 @@
+@startuml
+left to right direction
+
+actor User
+actor ATM
+actor Bank
+
+User --> (Authorize)
+    (Authorize) ..> (Enter pin code)
+        (Enter pin code)
+            (Enter pin code) <|-- (Show menu)
+            (Enter pin code) <|-- (Invalid pin code)
+                (Invalid pin code) <|-- (Block card)
+                (Invalid pin code) --> (Show error)
+User --> (Inquiry balance)
+User --> (Withdraw cash)
+    (Withdraw cash) ..> (Select amount)
+    (Select amount) ..> (Inquiry balance)
+    (Select amount) <|-- (Dispenses cash)
+        (Dispenses cash) ..> (Update balance)
+        (Dispenses cash) ..> (Print check)
+    (Select amount) <|-- (There is no enough money)
+        (There is no enough money) ..> (Show error)
+User --> (Transfer money)
+    (Transfer money) ..> (Inquiry balance)
+    (Transfer money) ..> (Enter amount)
+    (Transfer money) ..> (Enter receiver number)
+        (Enter receiver number) <|-- (Successfully transfer)
+            (Successfully transfer) ..> (Update balance)
+            (Successfully transfer) ..> (Print check)
+        (Enter receiver number) <|-- (There is no enough money)
+        (Enter receiver number) <|-- (Invalid receiver number)
+            (Invalid receiver number) ..> (Show error)
+User --> (Return card)
+
+(Show menu) <-- ATM
+(Show error) <-- ATM
+(Dispenses cash) <-- ATM
+(Return card) <-- ATM
+(Print check) <-- ATM
+(Block card) <-- ATM
+
+(Inquiry balance) <-- Bank
+(Update balance) <-- Bank
+@enduml

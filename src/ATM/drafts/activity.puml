@@ -1,0 +1,46 @@
+@startuml
+start
+
+:User inserts card;
+repeat
+    :User enters pin code;
+repeat while (Is pin code correct?) is (no)
+repeat
+    :ATM shows main menu;
+    :User chooses operation;
+    fork
+        #skyBlue :Balance enquire;
+        :ATM shows balance;
+    fork again
+        #skyBlue :Cash withdrawal;
+        repeat
+            :User enters desired amount;
+            backward :ATM shows rejection message;
+            repeat while (
+                amount > balance
+                **OR** amount > ATM limit
+                **OR** amount > account limit
+            ) is (yes)
+    fork again
+        #skyBlue :Transfer money;
+        repeat
+            :User enters number of destination card;
+            :User enters desired amount;
+        backward: ATM shows rejection message;
+        repeat while (
+            amount > balance
+            **OR** destination card is not found
+        ) is (yes)
+        :ATM shows confirmation message;
+    fork again
+        #skyBlue :Cancel;
+        :ATM returns card;
+        :User gets card;
+        stop
+    fork end
+    :ATM asks to print receipt;
+    if (Does user confirm printing?) then(yes)
+        :ATM prints receipt;
+    endif
+repeat while ()
+@enduml

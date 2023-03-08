@@ -1,0 +1,188 @@
+@startuml
+left to right direction
+
+abstract class Receipt {
+    - amount: int
+    - createdAt: DateTime
+}
+
+class BalanceReceipt extends Receipt {
+}
+
+class WithdrawalReceipt extends Receipt {
+}
+
+class TransferReceipt extends Receipt {
+    - receiverNumber: int
+}
+
+class Screen {
+    - text: string
+    + setText(text: string)
+    + getText(): string
+}
+
+class ATM {
+    - banks: FinanceNetwork[]
+    - display
+    - state: AtmState
+    - cash: int
+    - limit: int
+    + getCash(): int
+    + subCash(amount)
+    + getLimit(): int
+
+    + changeState()
+
+    + getScreen(): Screen
+    + insertCard(card)
+    + selectItem(itemInx: int)
+    + typeNumber(numbers: string)
+
+    + collectCard(): Card
+    + collectCash(): int | null
+    + collectReceipt(): Receipt | null
+}
+ATM *-- Screen: has
+ATM *-- AtmState: has
+ATM ..> FinanceNetwork: getBank()
+
+interface AtmState {
+    + insertCard(card)
+    + selectItem(itemInx: int)
+    + typeNumber(numbers: string)
+
+    + collectCard(): int | null
+    + collectCash(): int | null
+    + collectReceipt(): Receipt | null
+}
+AtmState --> ATM: setState() / getScreen()
+AtmState ..> Card: use
+
+class IdleState implements AtmState {
+    - atm
+    + constructor(atm)
+}
+IdleState ..> AuthorizationState: set
+
+class AuthorizationState implements AtmState {
+    - atm
+    - card
+    + constructor (atm, card)
+}
+AuthorizationState ..> FunctionChoiceState: set
+
+class FunctionChoiceState implements AtmState {
+    - atm
+    - card
+    - account
+    + constructor (atm, card, account)
+}
+FunctionChoiceState ..> BalanceEnquireState: set
+FunctionChoiceState ..> CashWithdrawalState: set
+FunctionChoiceState ..> TransferState: set
+FunctionChoiceState ..> IdleState: set
+
+class BalanceEnquireState {
+    - atm
+    - card
+    - account
+    + constructor (atm, card, account)
+}
+BalanceEnquireState ..> ReceiptState
+
+class CashWithdrawalState {
+    - atm
+    - card
+    - account
+    + constructor (atm, card, account)
+}
+CashWithdrawalState ..> ReceiptState
+CashWithdrawalState ..> ErrorState: not enough money \n account limit \n ATM limit
+
+class TransferState implements AtmState {
+    - atm
+    - card
+    - account
+    + constructor (atm, card, account)
+}
+TransferState ..> ReceiptState
+TransferState ..> ErrorState: not enough money \n account limit
+
+class ErrorState implements AtmState {
+    - referenceState: AtmState
+    + constructor(referenceState)
+}
+ErrorState ..> FunctionChoiceState: return to
+
+class ReceiptState implements AtmState {
+    - receipt: Receipt
+}
+ReceiptState o-- Receipt
+ReceiptState ..> IdleState
+
+
+class Card {
+    - id: string
+    - bankId: int
+}
+Card --> Bank: of
+
+class User {
+    - fullName: string
+    - cash: int
+    - cards: Card
+    + getCash(): int
+    + subCash(money)
+    + addCash(money)
+
+    + getBalance(): number;
+    + withdraw(money);
+    + transfer(cardId, money);
+}
+User *-- Card: has
+
+abstract class Account {
+    - user: User
+    - money: int
+    - card: Card
+    - pin: string
+    - limit: int
+    + getLimit(): int
+    + getUser(): Card
+    + getMoney(): Card
+    + getCard(): Card
+    + isValidPin(pin: string): boolean
+    + subMoney(money: int)
+    + addMoney(money: int)
+    + transferTo(account)
+}
+Account --> User: of
+Account --> Card: for
+
+class CurrentAccount extends Account {
+}
+
+class SavingAccount extends Account {
+}
+
+class Bank {
+    - id: int
+    - accounts: <Card.id, Account>
+    + hasAccount(cardId): boolean
+    + getAccount(cardId, pin): Account
+    + createAccount(user): Account
+}
+Bank *-- Account: has
+
+class FinanceNetwork {
+    - banks: <Bank.id, Bank>
+    + addBank(bank)
+    + getBank(id): Bank
+    + getBankByAccount(cardId): Bank
+    + transfer(from: Account, to: Account, amount)
+}
+FinanceNetwork o-- Bank: has \n get account
+FinanceNetwork --> Account: transfer()
+
+@enduml

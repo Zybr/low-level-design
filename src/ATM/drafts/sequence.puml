@@ -1,0 +1,157 @@
+@startuml
+actor User
+participant ATM
+participant IdleState
+participant AuthorizationState
+participant FunctionChoiceState
+participant BalanceEnquireState
+participant CashWithdrawalState
+participant TransferState
+participant ErrorState
+participant Receipt
+participant FinanceNetwork
+participant Bank
+participant Account
+
+title Balance Enquire
+
+User -> IdleState++: insertCard()
+IdleState -> AuthorizationState**: create
+AuthorizationState++
+IdleState--
+User <-- AuthorizationState: ask pin code
+User++
+User -> AuthorizationState: typeNumber()
+User--
+AuthorizationState -> FinanceNetwork++: getBank(card.bankId)
+AuthorizationState <-- FinanceNetwork--: return Bank
+AuthorizationState -> Bank++: getAccount(card.id, pin)
+AuthorizationState <-- Bank--: return Account
+AuthorizationState -> FunctionChoiceState**: create
+FunctionChoiceState++
+AuthorizationState -> AuthorizationState!!
+User <-- FunctionChoiceState: show menu
+AuthorizationState--
+
+newpage Balance inquiry
+    alt item - Balance inquiry
+        User++
+        User -> FunctionChoiceState: selectItem() - choose Balance Enquire
+        User--
+
+        FunctionChoiceState -> BalanceEnquireState**: create
+        BalanceEnquireState++
+        FunctionChoiceState -> FunctionChoiceState!!
+
+        BalanceEnquireState -> Account++: getMoney()
+        BalanceEnquireState <-- Account--: return money
+        User <-- BalanceEnquireState: show amount of money
+
+        User <-- BalanceEnquireState++: ask to print receipt
+        User -> BalanceEnquireState: selectItem()
+        alt yes
+            BalanceEnquireState -> BalanceEnquireState: print receipt
+            User <-- BalanceEnquireState: ask to collect receipt
+            User -> BalanceEnquireState: collectReceipt()
+        end if
+
+        User -> BalanceEnquireState--: cancel()
+        BalanceEnquireState -> FunctionChoiceState**: create
+        FunctionChoiceState++
+        BalanceEnquireState -> BalanceEnquireState!!
+
+newpage Cash Withdrawal
+
+    else item - Cash withdrawal
+        User++
+        User -> FunctionChoiceState: selectItem() - choose Cash withdrawal
+        User--
+
+        FunctionChoiceState -> CashWithdrawalState**: create
+        CashWithdrawalState++
+        FunctionChoiceState -> FunctionChoiceState!!
+        User <-- CashWithdrawalState: ask amount
+        User++
+        User -> CashWithdrawalState: typeNumber() - type required amount of money
+        User--
+
+        CashWithdrawalState -> Account++: getMoney()
+        CashWithdrawalState <-- Account--: return balance
+        CashWithdrawalState -> Account++: getLimit()
+        CashWithdrawalState <-- Account--: return limit
+        CashWithdrawalState -> ATM++: getLimit()
+        CashWithdrawalState <-- ATM--: return limit
+
+        alt \n - amount > account.money \n - amount > ATM.limit \n - amount > Balance.limit \n
+            CashWithdrawalState -> ErrorState**: create
+        end
+
+        CashWithdrawalState -> Account++: subMoney(amount)
+        Account -> Account--: reduce balance
+        CashWithdrawalState -> CashWithdrawalState: Dispense cash
+        User <-- CashWithdrawalState++: ask to collect cash
+        User -> CashWithdrawalState--: collectCash()
+
+        User <-- CashWithdrawalState++: ask to print receipt
+        User -> CashWithdrawalState: selectItem()
+        alt yes
+            CashWithdrawalState -> CashWithdrawalState: print receipt
+            User <-- CashWithdrawalState: ask to collect receipt
+            User -> CashWithdrawalState: collectReceipt()
+        end if
+
+        User -> CashWithdrawalState--: cancel()
+        CashWithdrawalState -> FunctionChoiceState++: create
+        CashWithdrawalState -> CashWithdrawalState!!
+
+newpage Transfer money
+
+    else item - Transfer money
+        User++
+        User -> FunctionChoiceState: selectItem() - choose Transfer Money
+        User--
+
+        FunctionChoiceState -> TransferState**
+        TransferState++
+        FunctionChoiceState -> FunctionChoiceState!!
+        User <-- TransferState++: ask target card & amount
+        User -> TransferState: selectItem() - select card number input
+        User -> TransferState: typeNumber() - type card number
+        User -> TransferState: selectItem() - select amount input
+        User -> TransferState--: typeNumber() - type amount
+
+        TransferState -> Account++: getMoney() -- check account A
+        TransferState <-- Account--: return money
+        TransferState -> FinanceNetwork++: getBankByAccount() - get account B
+        TransferState <-- FinanceNetwork--: return account B
+        TransferState -> FinanceNetwork++: transfer()
+        FinanceNetwork -> Account++: subMoney(): from account A
+        Account--
+        FinanceNetwork -> Account++: addMoney(): to account B
+        Account--
+        FinanceNetwork--
+        User <-- TransferState: transfer is done
+
+        User <-- TransferState++: ask to print receipt
+        User -> TransferState: selectItem()
+        alt yes
+            TransferState -> TransferState: print receipt
+            User <-- TransferState: ask to collect receipt
+            User -> TransferState: collectReceipt()
+        end if
+
+        TransferState -> FunctionChoiceState**: create
+        FunctionChoiceState++
+        TransferState --> TransferState!!
+end
+
+newpage Cancel
+FunctionChoiceState++
+User <-- FunctionChoiceState++: show main menu
+User -> FunctionChoiceState--: cancel()
+User <-- FunctionChoiceState++: ask to collect card
+User -> FunctionChoiceState--: collect card
+FunctionChoiceState -> IdleState**: create
+FunctionChoiceState -> FunctionChoiceState!!
+
+@enduml

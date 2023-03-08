@@ -1,0 +1,44 @@
+@startuml
+left to right direction
+
+actor Cardholder
+actor CardIssuer
+actor System
+actor Operator
+
+Cardholder --> (Insert card)
+    (Insert card) ..> (Verifying the cardholder's identity): include
+Cardholder --> (Transaction)
+    (Transaction) <|-- (Balance inquiry)
+    (Transaction) <|-- (Transfer)
+        (Transfer) ..> (Check sufficient funds in account): include
+        (Transfer) ..> (Check account transaction limits): incldue
+    (Transaction) <|-- (Cash withdrawal)
+        (Cash withdrawal) ..> (Check sufficient funds in account): include
+        (Cash withdrawal) ..> (Check account transaction limits): include
+        (Cash withdrawal) ..> (Check sufficient funds in ATM): include
+        (Cash withdrawal) ..> (Check ATM withdrawal limits): include
+        (Cash withdrawal) ..> (Dispense money): include
+    (Transaction) ..> (Return card): include
+    (Transaction) <.. (Dispense receipt): extend
+Cardholder --> (Change pin)
+Cardholder --> (Cancel transaction)
+    (Cancel transaction) ..> (Return card): include
+
+(Verifying the cardholder's identity) <-- CardIssuer
+(Check sufficient funds in account) <-- CardIssuer
+(Check account transaction limits) <-- CardIssuer
+(Block/Unblock account) <-- CardIssuer
+
+(Verifying the cardholder's identity) <-- System
+(Check sufficient funds in ATM) <-- System
+(Check ATM withdrawal limits) <-- System
+(Return card) <-- System
+(Dispense money) <-- System
+(Dispense receipt) <-- System
+
+(System startup/shutdown) <-- Operator
+(Refill printer receipts) <-- Operator
+(Refill cash dispenser) <-- Operator
+
+@enduml

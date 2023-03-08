@@ -1,0 +1,29 @@
+@startuml
+start
+:Insert card;
+:Enter pin code;
+:Choose function;
+fork
+    :Balance inquiry;
+    #skyBlue :Collect card;
+    #yellow :Collect receipt;
+fork again
+    :Cash withdrawal;
+    :Choose amount;
+    #skyBlue :Collect card;
+    #limeGreen :Collect cash;
+    #yellow :Collect receipt;
+fork again
+    :Transfer Money;
+    :Enter account number;
+    :Enter amount;
+    :Successful transaction;
+    #skyBlue :Collect card;
+    #yellow :Collect receipt;
+fork again
+    :Return card;
+    #skyBlue :Collect card;
+end fork
+
+stop
+@enduml
