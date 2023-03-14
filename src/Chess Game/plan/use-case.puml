@@ -1,0 +1,31 @@
+@startuml
+left to right direction
+
+Player --> (View open games)
+Player --> (Create/Update account)
+Player --> (Login/Logout)
+Player --> (Join a game)
+Player --> (Resign or forfeit a game)
+    (Resign or forfeit a game) ..> (Declare results): include
+        (Declare results) ..> (Validate move): extend
+Player --> (Create a new game)
+Player --> (Make move)
+    (Make move) ..> (Validate move): include
+    (Make move) <-- (Play king)
+    (Make move) <-- (Play queen)
+    (Make move) <-- (Play knight)
+    (Make move) <-- (Play rock)
+    (Make move) <-- (Play bishop)
+    (Make move) <-- (Play pawn)
+
+(Unblock member) <-- Admin
+    (Unblock member) ..> (Update membership): include
+(Update membership) <-- Admin
+(Add/modify member) <-- Admin
+(Block member) <-- Admin
+(Cancel membership) <-- Admin
+    (Cancel membership) ..> (Block member): extend
+(View open games) <-- Admin
+(Login/Logout) <-- Admin
+(Validate move) <-- Admin
+@enduml

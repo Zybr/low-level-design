@@ -1,0 +1,208 @@
+@startuml
+enum Color {
+    + White
+    + Black
+}
+
+class Piece {
+    - color: Color
+    + {abstract} canMove(board, srcBox, dstBox): bool
+}
+Piece *-- Color
+
+class King extends Piece {
+}
+
+class Queen extends Piece {
+}
+
+class Pawn extends Piece {
+}
+
+class Bishop extends Piece {
+}
+
+class Rook extends Piece {
+}
+
+class Knight extends Piece {
+}
+
+class Position {
+    + x: int
+    + y: int
+}
+
+class Box {
+    - piece: Piece
+    - position: Position?
+    + getPosition(): Position
+    + getPiece()
+    + isFree(): bool
+    + removePiece()
+}
+Box *-- Position: has
+Box o-- Piece: can contains
+
+class Board {
+    - boxes: Box[][]
+    + move(srcPosition, dstPosition)
+    + getBoxes(): Box[][]
+    - remove(box)
+}
+Board *-- Box: has
+note right of Board::move
+    if dstBox !isFree()
+        **remove**(dstPosition)
+    ...
+end note
+
+enum UserStatus {
+    + Active
+    + Canceled
+}
+
+abstract class User {
+    - username: string
+    - password: string
+    - status: UserStatus
+    + activate()
+    + cancel()
+    + isActive(): bool
+
+    + isValidPassword(password)
+    + resetPassword(oldPassword, newPassword)
+    + login(username, password)
+}
+User *-- UserStatus: has
+
+class Player extends User {
+    - game: Game?
+    - color: Color
+    + createGame(player)
+    + setColor(piece?)
+    + move(piece, dstPosition)
+    + forfeiture()
+    + exitGame()
+
+    + changesNotify(board: Board)
+}
+Player ..> Game: createGame() \n moves() \n forfeiture() \n exitGame()
+
+class Admin extends User {
+    + activateUser(user)
+    + blockUser(user)
+}
+Admin ..> Authorization: manages users
+
+class Authorization {
+    + registerPlayer(username, password): Player
+    + registerAdmin(username, password): Admin
+    + login(username, password): User
+    + getUser(username): User
+    + getAdmins(): Admin[]
+}
+Authorization o-- User: manages
+
+enum EndType {
+    + Checkmate
+    + Stalemate
+    + Forfeiture
+    + Resign
+}
+
+abstract class Log {
+}
+
+class MoveLog extends Log {
+    - player: Player
+    - piece: Piece
+    - removedPiece: Piece?
+    - srcPosition: Position
+    - dstPosition: Position
+}
+
+class EndLog extends Log {
+    - reason: EndType
+    - winner: Player
+}
+EndLog *-- EndType: has
+
+class History {
+    - logs: Log[]
+    + move(player, piece, srcPosition, dstPosition, removedPiece)
+    + checkmate(winner)
+    + stalemate()
+    + forfeiture(winner)
+    + resign(winner)
+}
+History *-- Log: contains of
+History ..> Player: author of action
+History ..> Position: new/dst position
+History ..> Piece: object of action
+
+
+enum GameStatus {
+    + Pending
+    + InProgress
+    + Checkmate
+    + Stalemate
+    + Forfeiture
+    + Resigned
+}
+
+class MoveController {
+    - board
+    + isValidMove(piece, srcPosition, dstPosition)
+    + hasCheckmate()
+}
+<> validation
+validation ..> Board
+validation ..> Piece
+validation ..> Position
+MoveController ..> validation: validate
+
+class Game {
+    - board: Board
+    - players: Player[]
+    - currentTurn: Player
+    - status: GameStatus
+
+    + constructor(playerA, playerB)
+    + getBoard(): Board
+
+    + move(player, piece, dstPosition): bool
+    + forfeiture(loser)
+    + resign(loser)
+}
+Game *-- GameStatus: has
+Game *-- Board: has
+Game *-- MoveController: has to validate moves
+Game --> History: has to track actions
+Game ..> Player: changesNotify()
+note right of Game::move
+MoveController::**isValidMove**(piece, srcPosition, dstPosition)
+Board:**move**(piece, dstPosition)
+History:**move**(player, piece, dstPosition)
+MoveController::**hasCheckmate**()
+switch **currentTurn**
+end note
+
+class Playground {
+    - games: Game[]
+    + createGame(playerA, playerB): Game
+    + getGames(): Games
+}
+Playground o-- Game: manges
+
+class System {
+    - authorization: Authorization
+    - playground: Playground
+    + getAuthorization(): Authorization
+    + getPlayground(): Playground
+    + createGame(playerA, playerB): Game
+}
+System o--> Authorization: provides user
+System o--> Playground: provides games
+
+@enduml

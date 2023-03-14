@@ -1,0 +1,254 @@
+@startuml
+
+enum Color {
+    + WHILE
+    + BLACK
+}
+
+class Piece {
+    - position: position
+    - color: Color
+}
+Piece *-- Color: have
+
+class King extends Piece {
+}
+
+class Queen extends Piece {
+}
+
+class Pawn extends Piece {
+}
+
+class Bishop extends Piece {
+}
+
+class Rook extends Piece {
+}
+
+class Knight extends Piece {
+}
+
+class PieceSet {
+    - pieces: Piece[]
+    + add(piece)
+    + remove(piece)
+}
+PieceSet o-- Piece: contains
+
+enum HorizontalPosition {
+    + A
+    + B
+    + C
+    + D
+    + E
+    + F
+    + G
+    + H
+}
+
+enum VerticalPosition {
+    + 1
+    + 2
+    + 3
+    + 4
+    + 5
+    + 6
+    + 7
+    + 8
+}
+
+class Position {
+    - horizontal: HorizontalPosition
+    - vertical: VerticalPosition
+}
+Position *-- HorizontalPosition: have
+Position *-- VerticalPosition: have
+
+class Box {
+    - piece: Piece
+}
+Box *-- Position: have
+Box o-- Piece: keep
+
+class Board {
+    - boxes: <horizontal, <vertical, Box>>
+    - sets: PieceSet
+    + move(piece, position)
+    + getBoxes(): Box[]
+    + getSets(): PieceSet[]
+    - remove(position)
+}
+Board *-- Box
+note right of Board::move
+    if position is occupied
+        **remove**(position)
+    ...
+end note
+
+abstract Notification {
+    - user: User
+    - message: string
+    + constructor(user)
+    + {abstract} getMessage()
+    + send()
+}
+Notification ..> User: send
+
+class InviteNotification extends Notification {
+}
+
+enum UserStatus {
+    + ACTIVE
+    + CANCELED
+}
+
+abstract class User {
+    - username: string
+    - password: string
+    - status: UserStatus
+    - notifications: Notification[]
+    + activate()
+    + cancel()
+    + isActive(): bool
+
+    + isValidPassword(password)
+    + resetPassword(oldPassword, newPassword)
+    + login(username, password)
+
+    + notify(notification)
+    + getNotifications(): Notification[]
+}
+User *-- UserStatus: have
+
+<> movement
+movement ..> Board
+movement ..> Piece
+movement ..> Position
+note as MovementNote
+move
+end note
+movement .. MovementNote
+
+class Player extends User {
+    - game: Game?
+    + createGame(startTime, player)
+    + joinGame(game)
+    + setPieceSet(piece)
+    + exitGame()
+    + move(piece, position)
+}
+Player --> Game: join / play
+Player ..> movement: move()
+
+class Admin extends User {
+    + activateUser(user)
+    + blockUser(user)
+
+    + validateMove(board, piece, newPosition)
+}
+Admin ..> Authorization: manage users
+Admin ..> movement: validateMove()
+
+class Authorization {
+    + registerPlayer(username, password): Player
+    + registerAdmin(username, password): Admin
+    + login(username, password): User
+    + getUser(username): User
+    + getAdmins(): Admin[]
+}
+Authorization o-- User: manage
+
+enum EndType {
+    + move
+    + checkmate
+    + stalemate
+    + forfeiture
+    + resign
+}
+
+abstract class Log {
+}
+
+class MoveLog extends Log {
+    - player: Player
+    - piece: Piece
+    - position: Position
+}
+
+class EndLog extends Log {
+    - reason: EndType
+    - winner: Player
+}
+EndLog *-- EndType
+
+class History {
+    - logs: Log[]
+    + move(player, piece, position)
+    + checkmate(player)
+    + stalemate(player)
+    + forfeiture(player)
+    + resign(player)
+}
+History *-- Log
+
+
+enum GameStatus {
+    + PENDING
+    + IN_PROGRESS
+    + CHECKMATE
+    + STALEMATE
+    + FORFEITURE
+    + RESIGNED
+}
+
+class Game {
+    - board: Board
+    - playerA: Player
+    - playerB: Player
+    - admin: Admin
+    - status: GameStatus
+
+    - startTime: DateTime
+    - joinedPlayers: Player[]
+    - winner: Player?
+    - setTurn: PieceSet
+
+    + constructor(startTime, playerA, playerB, admin)
+    + getBoard(): Board
+    + join(player)
+
+    + move(player, piece, position)
+    + checkmate(loser)
+    + stalemate(loser)
+    + forfeiture(loser)
+    + resign(loser)
+}
+Game *-- GameStatus
+Game ..> InviteNotification: send to players
+Game --> History: track actions
+note right of Game::move
+Admin:**validateMove**(board, piece, newPosition)
+Board:**move**(piece, newPosition)
+History:**move**(player, piece, newPosition)
+end note
+
+class Playground {
+    - games: Game[]
+    + createGame(startTime, playerA, playerB, admin): Game
+    + getGames(): Games
+}
+Playground o-- Game: mange
+
+class System {
+    - authorization: Authorization
+    - playground: Playground
+    + getAuthorization(): Authorization
+    + getPlayground(): Playground
+    + createGame(startTime, playerA, playerB): Game
+    - getFreeAdmin(startTime): Admin
+}
+System --> Authorization: manage users
+System --> Playground: mange games
+
+@enduml

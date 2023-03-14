@@ -1,0 +1,48 @@
+@startuml
+left to right direction
+
+actor Player
+actor System
+
+Player --> (account operation)
+(account operation) <|-- (register)
+    (register) ..> (create account): include
+(account operation) <|-- (login)
+(account operation) <|-- (logout)
+
+Player --> (see games)
+Player --> (see players)
+Player --> (create game)
+    (create game) ..> (define players)
+Player --> (join game)
+    (join game) ..> (start game): include
+        (start game) ..> (define next who move): include
+        (start game) ..> (define sets of pieces): include
+Player --> (forfeiture)
+    (forfeiture) ..> (end game): include
+        (end game) ..> (log): include
+Player --> (make a move)
+    (make a move) ..> (define game status): include
+        (make a move) ..> (log): include
+    (define game status) <|-- (define next who move)
+    (define game status) <|-- (checkmate)
+        (checkmate) ..> (end game): include
+    (define game status) <|-- (stalemate)
+        (stalemate) ..> (end game): include
+Player --> (resign)
+    (resign) ..> (end game): include
+Player --> (offer a draw)
+    (offer a draw) ..> (accept a draw): include
+Player --> (answer a draw)
+    (answer a draw) <|-- (accept a draw)
+        (accept a draw) ..> (end game): include
+    (answer a draw) <|-- (reject a draw)
+
+(create account) <-- System
+(define sets of pieces) <-- System
+(define next who move) <-- System
+(log) <-- System
+(define game status) <-- System
+(end game) <-- System
+@enduml
+

@@ -1,0 +1,119 @@
+@startuml
+abstract class Piece {
+}
+
+class Bishop extends Piece {
+}
+
+class Knight extends Piece {
+}
+
+class Queen extends Piece {
+}
+
+class Pwn extends Piece {
+}
+
+class Rook extends Piece {
+}
+
+class Box {
+    - piece: Piece
+}
+Box *-- Piece
+
+class ChessBoard {
+    - boxes: Box[][]
+    - creationDate: date
+    + getPieces(): Piece[]
+    + resetBoard(): void
+    + updateBoard(): void
+}
+ChessBoard *-- Box
+
+class Move {
+    - startBox: Box
+    - endBox: Box
+    - pieceKilled: Piece
+    - pieceMoved: Piece
+    - player: Player
+    - castlingMove: bool
+    + isCastlingMove(): bool
+}
+
+enum AccountStatus {
+    + Active
+    + Closed
+    + Canceled
+    + Blacklisted
+    + None
+}
+
+abstract class Account {
+    - id: int
+    - password: string
+    - status: AccountStatus
+    + resetPassword(): bool
+}
+Account *-- AccountStatus
+
+class Person {
+    - name: string
+    - streetAddress: string
+    - city: string
+    - state: string
+    - zipcode: int
+    - country: string
+}
+
+class Player extends Account {
+    - person: Person
+    - totalGamesPlayed: int
+    - whiteSide: bool
+    + isWhiteSide(): bool
+    + isChecked(): bool
+}
+Player *-- Person: is
+Player --> ChessMoveController: uses
+Player --> ChessGameView: sees
+
+class Admin extends Account {
+    + blockUser(): bool
+}
+
+class ChessMoveController {
+    + validateMove(): bool
+}
+ChessMoveController --> ChessGame: manipulates
+
+class ChessGameView {
+    + playMove(): void
+}
+
+enum GameStatus {
+    + Active
+    + BlackWin
+    + WhiteWin
+    + forfeit
+    + Stalemate
+    + Resignation
+}
+
+class ChessGame {
+    - players: Player[]
+    - board: ChessBoard
+    - currentTurn: Player
+    - status: GameStatus
+    - movesPlayed: Move[]
+    + isOver(): bool
+    + playerMove(): bool
+    + makeMove(): bool
+}
+ChessGame o-- Player: has
+ChessGame *-- GameStatus: has
+ChessGame --> ChessGameView: updates
+ChessGame *-- ChessBoard
+ChessGame *-- Move
+
+
+@enduml

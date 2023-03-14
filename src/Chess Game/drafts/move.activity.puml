@@ -1,0 +1,32 @@
+@startuml
+start
+
+repeat
+    :Player chooses a piece;
+
+    repeat
+        repeat
+            :Player choose a new position of the piece;
+        repeat while (Is move valid?) is (No)
+    repeat while (Does the player have check?) is (Yes)
+
+    :Move the piece;
+
+    if (Does the piece kill other piece?) then (Yes)
+        :Remove killed piece;
+    endif
+
+    if (Is it checkmate?) then (Yes)
+        stop
+    endif
+
+    if (Is it stalemate?) then (Yes)
+        stop
+    endif
+
+    if (Player wants to resign) then (yes)
+        stop
+    endif
+repeat while ()
+
+@enduml
