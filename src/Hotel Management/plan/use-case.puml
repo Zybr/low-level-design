@@ -1,0 +1,50 @@
+@startuml
+left to right direction
+actor Guest
+actor Receptionist
+actor System
+actor HouseKeeper
+
+Guest --> (Book room)
+    (Book room) ..> (Payment): include
+Guest --> (Payment)
+    (Payment) <|-- (Credit card)
+    (Payment) <|-- (Credit cash)
+Guest --> (View account)
+Guest --> (Register new account)
+Guest --> (Search booking)
+Guest --> (Cancel booking)
+    (Cancel booking) ..> (Refund payment): include
+Guest --> (Update booking)
+Guest --> (Print booking)
+Guest --> (Login/Logout)
+Guest --> (View booking)
+Guest --> (Return room key)
+
+(Register new account) <-- Receptionist
+(Login/Logout) <-- Receptionist
+(Book room) <-- Receptionist
+(View booking) <-- Receptionist
+(Cancel booking) <-- Receptionist
+(Print booking) <-- Receptionist
+(Check-in guest) <-- Receptionist
+    (Check-in guest) ..> (Issue room key): include
+(Issue room key) <-- Receptionist
+(Add room) <-- Receptionist
+(Update booking) <-- Receptionist
+(Search booking) <-- Receptionist
+(Check-out guest) <-- Receptionist
+    (Check-out guest) ..> (Return room key): include
+(Remove room) <-- Receptionist
+(Update room) <-- Receptionist
+
+Receptionist <|-- Manager
+(Add modify employee)  <-- Manager
+(Issue employ card) <-- Manager
+
+(Add/update room house keeping) <-- HouseKeeper
+
+(Send booking notification) <-- System
+(Add/update room charge) <-- System
+
+@enduml

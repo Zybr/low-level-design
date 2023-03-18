@@ -1,0 +1,37 @@
+@startuml
+actor Guest
+participant System
+participant Catalog
+participant Booking
+participant Payment
+participant Room
+
+Guest -> System++: getCatalog()
+Guest++
+Guest <-- System--: return Catalog
+Guest -> Catalog++: search()
+Guest <-- Catalog--: return Room[]
+
+Guest -> System++: book()
+    System -> Booking**: create
+Guest <-- System--: return Booking
+
+Guest -> System++: getServices()
+Guest <-- System--: return Service[]
+Guest -> Booking++: setServices()
+Booking--
+
+Guest -> Booking++: getPrepaymentCost()
+Guest <-- Booking--: return amount
+Guest -> Payment**: create with prepayment amount
+    Payment++
+    Payment -> Payment--: set status = **Pending**
+Guest -> Payment++: pay()
+    Payment -> Payment--: set status = **Payed**
+Guest -> Booking++: confirm() by Payment
+    Booking -> Room++: set status = **Reserved**
+    Room--
+    Booking--
+Guest--
+
+@enduml

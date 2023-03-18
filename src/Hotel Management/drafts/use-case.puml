@@ -1,0 +1,57 @@
+@startuml
+left to right direction
+
+actor Guest
+actor System
+actor Housekeeper
+actor Receptionist
+
+Guest --> (search room)
+    (search room) <|-- (by cost range)
+    (search room) <|-- (by room type)
+        (by room type) <|-- (standard)
+        (by room type) <|-- (deluxe)
+        (by room type) <|-- (family suite)
+        (by room type) <|-- (business suite)
+Guest --> (book room)
+    (book room) ..> (define branch): includes
+    (book room) ..> (define room): includes
+    (book room) ..> (define check-in date): includes
+    (book room) ..> (define check-out date): includes
+    (book room) <.. (add service): extends
+        (add service) <|-- (room service)
+        (add service) <|-- (food service)
+        (add service) <|-- (kitchen service)
+        (add service) <|-- (amenity)
+    (book room) ..> (partially pay bill in advance): includes
+        (partially pay bill in advance) <|-- (pay by card)
+        (partially pay bill in advance) <|-- (pay by cash)
+        (partially pay bill in advance) ..> (send notification): includes
+Guest --> (cancel booking)
+    (cancel booking) <.. (return money): extends
+    (cancel booking) ..> (send notification): includes
+Guest --> (check in)
+    (check in) ..> (pay rest part of the bill): includes
+        (pay rest part of the bill) <|-- (pay by card)
+        (pay rest part of the bill) <|-- (pay by cash)
+    (check in) ..> (register guest): includes
+    (check in) ..> (receive key): includes
+Guest --> (check out)
+    (check out) ..> (unregister guest): includes
+        (unregister guest) ..> (clean room): includes
+            (clean room) ..> (mark the room as free): includes
+    (check out) ..> (return key): includes
+
+(send notification) <-- System
+    (send notification) <|-- (booking notification)
+    (send notification) <|-- (canceling notification)
+(return money) <-- System
+
+(register guest) <-- Receptionist
+(receive key) <-- Receptionist
+(unregister guest) <-- Receptionist
+(return key) <-- Receptionist
+
+(clean room) <-- (Housekeeper)
+
+@enduml

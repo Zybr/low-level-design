@@ -1,0 +1,43 @@
+@startuml
+actor Guest
+participant System
+participant Hotel
+actor Receptionist
+participant Booking
+participant Payment
+participant Room
+
+Guest++
+Guest -> System++: getCurrentBooking() for me
+Guest <-- System--: return Booking
+Guest -> Booking++: getHotel()
+Guest <-- Booking--: return Hotel()
+Guest -> Hotel++: getReceptionists()
+Guest <-- Hotel--: return Receptionist[]
+
+Guest -> Receptionist++: checkIn()
+    Receptionist -> Booking++: getPaymentCost()
+    Receptionist <-- Booking--: return full-cost
+    Receptionist -> Booking++: getPrepaymentCost()
+    Receptionist <-- Booking--: return pre-cost
+    Receptionist -> Payment**: create with **amount** = full-cost - pre-cost
+    Payment++
+    Payment -> Payment--: set status = **Pending**
+Guest <-- Receptionist: return Payment
+
+Guest -> Payment++: pay()
+    Payment -> Payment--: set status = **Payed**
+    Receptionist -> Booking++: pay() by Payment
+        Booking -> Room++: set status = **CheckedIn**
+        Room--
+        Booking--
+    Receptionist -> Booking++: getRoom()
+    Receptionist <-- Booking--: return Room
+    Receptionist -> Room++: getNum()
+    Receptionist <-- Room--: return num
+    Receptionist -> Hotel++: popKey()
+    Receptionist <-- Hotel--: return RoomKey
+Guest <-- Receptionist: return RoomKey
+Guest--
+
+@enduml

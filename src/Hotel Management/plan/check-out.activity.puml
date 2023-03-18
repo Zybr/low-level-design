@@ -1,0 +1,11 @@
+@startuml
+start
+:Customer arrives at the hotel counter;
+:Receptionist searches customer's booking;
+if (Is it within due date?) then (yes)
+    :Issue refund;
+endif
+:Give the customer the detail of the cancellation;
+:Update room's booking status to 'Available';
+stop
+@enduml

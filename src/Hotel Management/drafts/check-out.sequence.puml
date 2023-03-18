@@ -1,0 +1,48 @@
+@startuml
+actor Guest
+actor Receptionist
+participant Hotel
+participant Booking
+participant Payment
+actor Housekeeper
+participant System
+participant Catalog
+participant Room
+
+Guest -> Receptionist++: checkOut()
+Guest++
+Guest <- Receptionist--: getKey()
+Guest --> Receptionist++: return RoomKey
+    Receptionist -> Hotel++: put() RoomKey
+        Hotel--
+    Receptionist -> System++: getCurrentBooking() for Guest
+    Receptionist <-- System--: return Booking
+    Receptionist -> Booking++: cancel()
+        Booking -> Room: set status = **CheckedOut**
+        Room++
+        Room--
+        Booking -> Booking!!
+    Receptionist -> Hotel: getHousekeepers()
+    Receptionist <-- Hotel: return Housekeeper[]
+    Receptionist -> Housekeeper++: clean
+Guest <-- Receptionist: done
+Receptionist--
+Guest--
+
+Housekeeper -> System++: getCatalog()
+Housekeeper <-- System--: return Catalog
+Housekeeper -> Catalog++: getByStatus() status = CheckedOut
+Housekeeper <-- Catalog--: return Room[]
+
+loop each Room with status = CheckedOut
+    Housekeeper -> Room++: open by MasterKey
+    Room--
+    Housekeeper -> Room++: clean()
+    Room-> Room: set status = **Free**
+    Room--
+    Housekeeper -> Room++: close by MasterKey
+    Room--
+    Housekeeper--
+end
+
+@enduml

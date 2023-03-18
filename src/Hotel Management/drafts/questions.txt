@@ -1,0 +1,14 @@
+What characteristics room has?
+Does price depend on season?
+Can be order paid by cash? For example, it can be booked in advance but paid at time when a customer arrived.
+Can customer change booking after it became active?
+Can customer change leaving day before booking activation?
+What workers do and how it should be tracked/managed in the system?
+
+-----
+
+Collisions
+Payment
+Pricing
+Canceling
+

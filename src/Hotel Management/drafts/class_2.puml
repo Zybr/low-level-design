@@ -1,0 +1,272 @@
+@startuml
+abstract class Notification {
+    - user: User
+    + {abstract} getText(): string
+    + send()
+}
+Notification --> User: informs
+
+class BookingNotification extends Notification {
+}
+
+class CancelingNotification extends Notification {
+}
+
+class Bill <<?>> {
+    - amount: int
+    - payment: payment | null
+    + isPayed(): bool
+    + pay(payment)
+}
+
+enum PaymentStatus {
+    - Pending
+    - Payed
+    - Refunded
+}
+
+abstract class Payment {
+    - amount: int
+    - status: PaymentStatus
+    - createdAt: DateTime
+    + isPayed(): bool
+    + pay(amount)
+}
+Payment *-- PaymentStatus
+
+class CashPayment extends Payment {
+}
+
+class CardPayment extends Payment {
+}
+
+
+abstract class Key {
+    - rooms: Room[]
+    + getRooms(): Room[]
+}
+
+class RoomKey extends Key {
+    + constructor(room)
+}
+
+class MasterKey extends Key {
+    + constructor(rooms)
+}
+
+enum RoomType {
+    + Standard
+    + Deluxe
+    + FamilySuite
+    + BusinessSuite
+}
+
+enum RoomStatus {
+    + Free
+    + Reserved
+    + CheckedIn
+    + CheckedOut
+}
+
+class Room {
+    - hotel: Hotel
+    - num: int
+    - type: RoomType
+    - closed: bool
+    - status: RoomStatus
+    - rate: int
+    + getNum(): num
+    + open(key)
+    + close(key)
+    + clean()
+}
+Room *-- RoomType: has
+Room *-- RoomStatus: has
+note left of Room::rate
+price for a day
+end note
+
+
+abstract class Service {
+    - rate
+}
+
+class RoomService extends Service {
+}
+
+class FoodService extends Service {
+}
+
+class KitchenService extends Service {
+}
+
+class Amenity extends Service {
+}
+
+
+class Booking {
+    - user: User
+    - room: Room
+    - services: Services[]
+    - checkInDate: DateTime
+    - checkOutDate: DateTime
+    - payments: Payment[]
+    + constructor(user, room, checkInDate, checkOutDate)
+    + getHotel()
+
+    + getServices()
+    + setServices(services)
+
+    + getPrepaymentCost(): int
+    + getPaymentCost(): int
+    + confirm(pay)
+    + pay(pay)
+
+    + cancel()
+
+}
+Booking --> Guest: for
+Booking o-- Room: includes
+Booking o-- Service: includes
+Booking --> Payment: has / confirm() / pay()
+
+class Printout {
+    + constructor(booking)
+    - hotelName: string
+    - address: string
+    - roomNum: string
+    - checkInDate: DateTime
+    - checkOutDate: DateTime
+}
+
+class Address {
+    - country: string
+    - state: string
+    - zipCode: string
+    - streetAddress: string
+}
+
+class Hotel {
+    - name: string
+    - address: Address
+    - rooms: Room[]
+    - keys: Map<roomNum, RoomKey>
+    - masterKeys: MasterKey[]
+    - receptionists: Receptionist[]
+    + popKey(roomNum): RoomKey | null
+    + putKey(key): RoomKey | null
+    + createRoom(type)
+    + getRooms(): Room[]
+    + getReceptionists(): Receptionist[]
+    + getHousekeepers(): Housekeeper[]
+}
+Hotel *--> Address: has
+Hotel *-- Room: has
+Hotel *-- Manager: has
+Hotel *-- Housekeeper: has
+Hotel *-- Receptionist: has
+
+
+abstract class User {
+    - username: string
+    - password: string
+    - notifications: Notification[]
+    + resetPassword(oldPassword, newPassword)
+    + notify(notification)
+}
+
+abstract class Guest extends User {
+    - money: int
+    - kye: RoomKey | null
+    + getMoney(): int
+    + addMoney(amount)
+    + subtractMoney(amount)
+
+    + book(hotel, type, start, end): Booking
+    + confirm(booking)
+    + cancel(booking)
+    + setKye(key | nul)
+    + checkIn()
+    + checkOut()
+}
+Guest o-- RoomKey: has
+
+abstract class Receptionist extends User {
+    - hotel: Hotel
+    + constructor(hotel)
+
+    + addRoom(room)
+    + removeRoom(room)
+
+    + book(guest, type, start, end): Booking
+    + print(book): Printout
+    + confirm(booking, payment)
+    + cancel(booking)
+
+    + checkIn(guest)
+    + checkOut(guest)
+}
+Receptionist::print ..> Printout: create
+note right of Receptionist::addRoom
+add room to the catalog
+end note
+
+abstract class Manager extends Receptionist {
+    + addManager(hotel, username, password)
+    + addReceptionist(hotel, username, password)
+    + addHousekeeper(hotel, username, password)
+}
+
+abstract class Housekeeper extends User {
+    - key: MasterKey
+    + constructor(key)
+    + setKey(key)
+    + clean()
+}
+Housekeeper o-- MasterKey: has
+
+class Authorization {
+    - users: User[]
+    + createGuest(username, password)
+    + createManager(hotel, username, password)
+    + createReception(hotel, username, password)
+    + createHousekeeper(hotel, username, password)
+    + login(username, password): User
+}
+Authorization *-- User: has & manages
+
+class RoomsFilter {
+    - hotel: Hotel | null
+    - types: RoomType[]
+    - costRange: [int | null, int | null]
+    - timeRange: [DateTime | null, DateTime | null]
+}
+
+class Catalog {
+    - rooms: Room[]
+    + add(room)
+    + remove(room)
+    + search(roomSearch): Room[]
+    + getByStatus(status): Room[]
+}
+Catalog o-- Room: has / provides
+Catalog::search ..> RoomsFilter: use
+
+class System <<Singleton>> {
+    - authorization: Authorization
+    - catalog: Catalog
+    - services: Service[]
+    - bookings: Booking
+    + addService(service)
+    + getAuthorization(): Authorization
+    + getCatalog(): Catalog
+    + getServices(): Service[]
+    + book(room, start, end)
+    + getCurrentBooking(user): Booking
+}
+System *-- Booking: manages
+System o-- Service: provides
+System ..> Authorization: provides
+System ..> Catalog: provides
+
+@enduml

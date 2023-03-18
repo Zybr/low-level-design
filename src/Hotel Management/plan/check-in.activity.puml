@@ -1,0 +1,17 @@
+@startuml
+start
+:Customer arrives at the hotel counter;
+:Receptionist searches the customer's booking;
+
+if (Is valid booking?) then (Yes)
+    if (Is the room ready?) then (Yes)
+    else (No)
+        :Request customer to wait;
+    endif
+    :Issue room key;
+    :Update room's booking status to 'Checked-in';
+else (No)
+endif
+
+stop
+@enduml
