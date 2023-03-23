@@ -1,0 +1,83 @@
+@startuml
+== Make order ==
+Customer++
+
+' Fill cart
+Customer -> System++: getCatalog()
+Customer <-- System--: Catalog
+
+loop Fill cart
+    Customer -> SearchFilter**: create
+    Customer -> Catalog++: search(SearchFilter)
+    Customer <-- Catalog--: Product[]
+    Customer -> Cart++: addItem(Product, quantity)
+        Cart -> Item**: create
+        Cart--
+end
+
+' Make order
+Customer -> Cart++: order()
+    Cart -> Order**: create from Cart::Item[]
+        Order++
+        Order -> Order--: status = **Pending**
+        note right: Log & send notification
+Customer <-- Cart--: get Order
+
+' Confirm order
+Customer -> Order++: getCost()
+Customer <-- Order--: amount
+
+alt Customer::Wallet::Card exists
+    Customer -> CardPayment**: create by amount
+        CardPayment++
+        CardPayment -> CardPayment--: status = **Pending**
+    Customer -> CardPayment: pay(Customer::Wallet::Card)
+        CardPayment++
+        CardPayment -> Card++: subMoney()
+        CardPayment <-- Card--: amount
+        CardPayment -> CardPayment--: status = **Payed**
+end
+
+Customer -> Order++: confirm(Customer:Addresses[x], CardPayment?)
+    Order -> Order--: status = **Confirmed**
+    note right: Log & send notification
+Customer--
+
+== Deliver order ==
+
+' Process order
+System -> System++: processOrders()
+System -> System: filter Orders[]::isConfirmed()
+System -> Order++: Order::ship()
+    Order -> Order--: status = **Shipped**
+    note right: Log & send notification
+System -> Authorization++: getDeliverers()
+System <-- Authorization--: Deliverers[]
+System -> Deliverer++: deliver(Order)
+System--
+    Deliverer -> Order++: deliver()
+        Order -> Order--: status = **Delivering**
+        note right: Log & send notification
+    Deliverer -> Order++: getCustomer()
+    Deliverer <-- Order--: Customer
+
+alt NOT Order::isPayed()
+    Deliverer -> CashPayment**: create
+    Deliverer--
+        CashPayment++
+        CashPayment -> CashPayment--: status = **Pending**
+Customer -> CashPayment++: pay(Customer::Wallet)
+Customer++
+        CashPayment -> CashPayment--: status = **Payed**
+Customer--
+end
+
+Deliverer -> Customer: pushOrder(Order)
+Customer++
+Customer--
+Deliverer++
+Deliverer -> Order++: done()
+    Order -> Order--: status = **Done**
+    note right: Log & send notification
+Deliverer--
+@enduml

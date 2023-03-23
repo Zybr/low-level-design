@@ -1,0 +1,249 @@
+@startuml
+class Category {
+    - name: string
+}
+
+class Review {
+    - text: string
+}
+
+class Rate {
+    - value: int
+    - author: Customer
+}
+
+class Product {
+    - customer: Customer
+    - name: string
+    - quantity: int
+    - price: int
+    - category: Category
+    - reviews: Reviews[]
+    - rates: Reviews[]
+    + addReview(review)
+    + addRate(rate)
+    + getAverageRate(): float
+    + getPrice(): int
+}
+Product "*" *-- "1" Category: has
+Product "*" --> "1" Customer: owned by
+Product "1" --> "*" Review: has
+Product "1" --> "*" Rate: has
+
+class SearchFilter {
+    - name: string
+    - categories: Category[]
+}
+'SearchFilter "1" o-- "*" Category: includes
+
+class Catalog {
+    - products: Product[]
+    - categories: Category[]
+    + createCategory(name): Category
+    + removeCategory(category)
+
+    + addProduct(product)
+    + removeProduct(product)
+    + search(filter): Product[]
+}
+Catalog "1" o-- "*" Category: has
+Catalog "1" o-- "*" Product: has
+Catalog ..> SearchFilter: uses
+
+class Item {
+    - product: Product
+    - quantity: int
+    + getCost(): int
+}
+Item "1" o-- "1" Product: of
+
+class Cart {
+    - items: Item[]
+    + getItems(): Item[]
+    + addItem(product, quantity): Item
+    + removeItem(item)
+    + getCost(): int
+    + order(): Order
+}
+Cart "1" o-- "*" Item: has
+Cart ..> Order: order() - create
+
+enum PaymentStatus {
+    + Pending
+    + Payed
+    + Refund
+}
+
+abstract Payment {
+    - amount: int
+    - status: PaymentStatus
+    + pay(amount: int)
+}
+Payment *- PaymentStatus: has
+
+class BankTransferPayment extends Payment {
+}
+
+class CardPayment extends Payment {
+}
+
+class CashPayment extends Payment {
+}
+
+class Address {
+    - country: string
+    - state: string
+    - streetAddress: string
+    - zipCode: string
+}
+
+enum OrderStatus {
+    + Pending
+    + Confirmed
+    + Shipped
+    + Delivering
+    + Done
+    + Canceled
+}
+
+class Order {
+    - items: Item[]
+    - payment: Payment
+    - status: OrderStatus
+    - address: Address
+    + getCost(): int
+    + confirm(address, payment?)
+    + setStatus(status)
+    + cancel()
+}
+Order *- OrderStatus: has
+Order "1" o-- "*" Item: has
+Order "1" o-- "1" Address: has
+Order ..> Payment: confirm()
+
+abstract Notification {
+    - text
+    + send(user: User)
+}
+Notification ..> User: to
+
+class OrderingNotification extends Notification {
+}
+
+class ShipmentNotification extends Notification {
+}
+
+class DeliveringNotification extends Notification {
+}
+
+class CancelingNotification extends Notification {
+}
+
+class Guest {
+    + search(filter)
+}
+Guest ..> Catalog: search()
+
+enum UserStatus {
+    + Active
+    + Blocked
+}
+
+abstract User {
+    - username: string
+    - password: string
+    + resetPassword(old, new)
+    + isValidPassword(password): bool
+
+    + block()
+    + unblock()
+}
+User *- UserStatus: has
+
+class Card {
+    - money: int
+    + addMoney(amount)
+    + subtractMoney(amount)
+}
+
+class Wallet {
+    - cash: int
+    - card: Card
+    + getCard(): Cart
+    + setCard(card)
+    + addCash(amount)
+    + subtractCash(amount)
+}
+Wallet "1" *--> "*" Card: contains
+
+class Customer extends User {
+    - address: Address
+    - card: Card
+    - wallet: Wallet
+    - cash: int
+    - orders: Order[]
+
+    + getWallet(): Wallet
+    + getCart(): Wallet
+
+    + setAddress(address)
+
+    + createProduct(name, quantity, price, category)
+    + removeProduct(product)
+
+    + createReview(product, description)
+    + createRate(product, value)
+
+    + pushOrder(order)
+}
+Customer "1" *-- "1" Cart: has
+Customer "1" *-- "1" Address: has
+Customer "1" *-- "1" Wallet: has
+Customer ..> Catalog: searches / manages
+note left of Customer::orders
+Delivered orders
+end note
+
+class Admin extends User {
+    + blockUser(user)
+    + unblock(user)
+
+    + createCategory(name)
+    + removeCategory(category)
+
+    + removeProduct(product)
+}
+Admin --> Authorization: manages users
+Admin --> Catalog: manages products
+
+class Deliverer extends User {
+    + deliver(order)
+}
+Deliverer ..> Order: deliver()
+
+class Authorization {
+    - users: User[]
+    + registerUser(username, password)
+    + registerAdmin(username, password)
+    + registerDeliverer(username, password)
+
+    + login(username, password): User
+}
+Authorization "1" *-- "*" User: manages
+
+class System <<singleton>> {
+    - authorization: Authorization
+    - catalog: Catalog
+    - orders: Order[]
+    + getAuthorization(): Authorization
+    + getCatalog(): Catalog
+
+    + addOrder(order)
+    + removeOrder(order)
+    + processOrders()
+}
+System ..> Authorization: provides
+System ..> Catalog: provides
+System ..> Order: process
+
+@enduml

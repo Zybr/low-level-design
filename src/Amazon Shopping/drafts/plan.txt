@@ -1,0 +1,34 @@
+Questions
+    - Can a product be in several categories?
+    - Can categories be nested?
+    - Can review and rating be changed?
+    - Can be an order canceled?
+        - before & after payment
+    - When user pay?
+    - Can user pay cash?
+    - Can be a whole order or specific items returned?
+    - What is possible statuses of order
+        - payed
+        - packed
+        - shipped
+        ...
+    - Which roles excluding customer there are in the system?
+    - Can be made an auction?
+    - What is the system's commission?
+    - Can a user preorder (in advance) an absent product or subscribe on its status?
+
+Patterns
+    Singleton - System
+    Repository - Product
+    Composite - Cart price -> product price
+    ? State
+        - Product exists / absents
+        - Order status/state
+    Observer - receive notifications
+
+
+---
+Search
+Pay & check
+Reviews & ratings
+

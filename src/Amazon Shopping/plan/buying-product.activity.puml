@@ -1,0 +1,35 @@
+@startuml
+start
+label start
+:Customer lands on the shopping system home page;
+fork
+    :Customer searches for a product;
+    fork
+        :Search by name;
+    fork again
+        :Search by category;
+    fork end
+    if (Product found?) then(no)
+        goto start
+        break
+    else (yes)
+    endif
+fork again
+    :Customer browses a category;
+    :Customer selects product;
+fork end
+
+:View product;
+:Add item to the shopping cart;
+:View shopping cart;
+
+fork
+    :Modify item;
+fork again
+    :Delete item;
+fork again
+    :Proceed;
+fork end
+:Checkout;
+stop
+@enduml

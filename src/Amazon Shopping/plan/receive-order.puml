@@ -1,0 +1,31 @@
+@startuml
+start
+
+label start
+:The customer lands on checkout page;
+
+if (The customers is asked for a payment option) then
+    :Customer select credit card;
+    :Customer submits credit card information;
+    if (The payment is confirmed?) then (no)
+        goto start
+        break;
+    else(yes)
+    endif
+else
+    :Customer selects cash on delivery;
+endif
+
+:Selected items from the customers cart are removed;
+:The customer is shown their order summary;
+:Shipment status is set as "Active";
+:Shipment status is set as "Completed";
+:Customer receives a notification;
+
+if (Cash on delivery was selected) then(yes)
+    :Customer pays cash to delivery person;
+endif
+:The customer receives their package;
+
+stop
+@enduml

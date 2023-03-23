@@ -1,0 +1,66 @@
+@startuml
+left to right direction
+
+Guest --> (search)
+    (search) <|-- (search by name)
+    (search) <|-- (search by category)
+Guest --> (register)
+
+Guest <|-- User
+User --> (self account operation)
+    (self account operation) <|-- (login)
+    (self account operation) <|-- (logout)
+    (self account operation) <|-- (edit account)
+    (self account operation) <|-- (delete account)
+User --> (cart operation)
+    (cart operation) <|-- (put product)
+    (cart operation) <|-- (remove product)
+    (cart operation) <|-- (set quantity)
+    (cart operation) <|-- (checkout cart): extends
+User --> (add credit card)
+User --> (add shipping address)
+User --> (confirm order)
+        (checkout cart) <.. (confirm order): extends
+            (confirm order) <.. (pay online): extends
+                (pay online) <|-- (by card)
+                (pay online) <|-- (by bank transfer)
+            (confirm order) ..> (order change notification): includes
+            (confirm order) ..> (specify shipping address): includes
+                (specify shipping address) <|.. (chose existed address): extends
+                (specify shipping address) <|.. (add new address): extends
+User --> (track shipment): ?
+User --> (pay offline)
+    (pay offline) <|-- (by cash)
+User --> (put product for sale)
+    (put product for sale) ..> (set price): includes
+    (put product for sale) ..> (set source product quantity): includes
+    (put product for sale) ..> (modify catalog): extends
+User --> (cancel order)
+    (cancel order) <.. (refund money): extends
+User --> (review product)
+User --> (rate product)
+
+(self account operation) <-- Admin
+(modify catalog) <-- Admin
+    (modify categories) <-- Admin
+        (add category) --|> (modify categories)
+        (remove category) --|> (modify categories)
+        (edit category) --|> (modify categories)
+    (add product) --|> (modify catalog)
+    (modify product) --|> (modify catalog)
+        (change quantity) ..> (modify product): extends
+        (?) ..> (modify product): extends
+    (remove product) --|> (modify catalog)
+(block/unblock user) <-- Admin
+
+(send notification) <-- System
+    (order change notification) --|>(send notification)
+    (shipping change notification) --|>(send notification)
+(ship) <-- System
+    (shipping change notification) <.. (ship): includes
+(refund money) <-- System
+
+(deliver products) <-- Deliverer
+(pay offline) <.. (deliver products): includes
+
+@enduml
