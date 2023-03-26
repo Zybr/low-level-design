@@ -1,0 +1,47 @@
+@startuml
+left to right direction
+
+Guest --> (search questions)
+    (search questions) <|-- (search by tag)
+    (search questions) <|-- (search by username)
+    (search questions) <|-- (search by words)
+
+Guest <|-- User
+User --> (post a question)
+    (post a question) <.. (add tags): extends
+        (add tags) ..> (update rate of tag): includes
+        (add tags) <.. (create a new one): extends
+User --> (add an answer to a question)
+    (add an answer to a question) ..> (send notification): includes
+User --> (add a comment)
+    (add a comment) <|-- (comment to a question)
+    (add a comment) <|-- (comment to an answer)
+User --> (add flag)
+    (add flag) <|-- (flag to a question)
+    (add flag) <|-- (flag to an answer)
+    (add flag) <|-- (flag to a comment)
+User --> (upvote / downvote)
+    (upvote / downvote) <|-- (to question)
+        (to question) ..> (send notification)
+    (upvote / downvote) <|-- (to answer)
+        (to answer) ..> (send notification)
+    (upvote / downvote) <|-- (to comment)
+        (to comment) ..> (send notification)
+    (upvote / downvote) ..> (update user's reputation): includes
+User --> (vote to delete)
+    (vote to delete) <|-- (to delete question)
+    (vote to delete) <|-- (to close question)
+    (vote to delete) <|-- (to delete answer)
+User --> (add bounty to question)
+
+Moderator --> (close a question)
+Moderator --> (restore a question)
+Moderator --> (delete an answer)
+
+(send notification) <-- System
+    (send notification) <.. (get badge): includes
+(update user's reputation) <.. (get badge): extends
+(get badge) <-- System
+(update rate of tag) <-- System
+
+@enduml

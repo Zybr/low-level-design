@@ -1,0 +1,312 @@
+@startuml
+enum VoteType {
+    + Up
+    + Down
+    + Close
+    + Delete
+}
+class Vote {
+    - author: Writer
+    - type: VoteType
+    + constructor(message, author, type)
+    + getAuthor(): Writer
+    + isUp(): bool
+    + isDown(): bool
+    + setType(type)
+}
+Vote *- VoteType: has
+Vote ..> ReputationController: updateReputation()
+note left of Vote::constructor
+    new VoteNotification
+    ReputationController::updateReputation(message::author)
+end note
+
+class Flag {
+    - author: Writer
+    + constructor(author)
+    + getAuthor(): Writer
+}
+
+abstract Message {
+    - author: Writer
+    - text: string
+    - flags: Map<Writer, Flag>
+    - votes: Map<VoteType, <Writer, Vote>>
+    - createdAt: DateTime
+    - updateAt: DateTime
+    + constructor(author, text)
+
+    + setText(text)
+    + getRate(): int
+    + flag(author): Flag
+
+    + upVote(author): Vote
+}
+Message *-- Flag: has
+Message *-- Vote: has
+
+class Tag {
+    - name: string
+    - rate: int
+    + constructor(name)
+    + getName(): string
+    + getRate(): int
+    + incrementRate()
+}
+
+class TagsCollection {
+    - tags: Tags[]
+    + has(name): bool
+    + create(name): Tag
+    + get(name): Tag
+}
+TagsCollection *-- Tag: manages
+
+class Bounty {
+    - rate: int
+    + getRate(): int
+}
+
+enum QuestionStatus {
+    + Active
+    + Answered
+    + Closed
+    + Remove
+}
+
+class Question extends Message {
+    - title: string
+    - answers: Answer[]
+    - comments: Comment[]
+    - status: QuestionStatus
+    - tags: Tag[]
+    - bounty: Bounty | null
+
+    + constructor(author, text, title, tags)
+
+    + setTags(string[])
+
+    + hasBounty()
+    + enabledBounty()
+    + disabledBounty()
+
+    + isActive()
+    + isClosed()
+    + isRemoved()
+
+    + close()
+    + restore()
+    + reopen()
+
+    + createAnswer(author, text): Answer
+    + removeAnswer(answer)
+    + acceptAnswer(answer)
+
+    + createComment(author, text): Comment
+    + removeComment(comment)
+
+    + downVote(author): Vote
+    + closeVote(author): Vote
+    + deleteVote(author): Vote
+}
+Question *- QuestionStatus: has
+Question *-- Tag: has
+Question *-- Answer: has
+Question *-- Comment: has
+Question *-- Bounty: has
+
+class Answer extends Message {
+    - question: Question
+    - author: Writer
+    - comments: Comment[]
+    - constructor(question)
+
+    + getQuestion(): Question
+
+    + accept(user)
+    + createComment(author, text): Comment
+    + removeComment(comment)
+
+    + downVote(author): Vote
+    + deleteVote(author): Vote
+}
+Answer *-- Comment: has
+
+
+class Comment extends Message {
+}
+
+class Catalog {
+    - questions: Question[]
+    + getQuestions(): Question[]
+    + createQuestion(author, text, title, tags): Question[]
+    + removeQuestion(question)
+}
+Catalog o-- Question: manages
+
+interface Search #yellow {
+    + searchByAuthor(username): Question[]
+    + searchByTag(tag): Question[]
+    + searchByText(text): Question[]
+}
+
+class SearchCatalog #yellow extends Catalog implements Search {
+    - usersQuestion: Map<string, Question[]>
+    - tagsQuestions: Map<string, Question[]>
+}
+
+class Guest {
+    + searchByAuthor(username): Question[]
+    + searchByTag(tag): Question[]
+    + searchByText(text): Question[]
+
+    + register(username, password)
+}
+Guest ...> SearchCatalog: read
+note left of Guest::register
+Create Writer
+end note
+
+enum BadgeType {
+    - Silver
+    - Gold
+    - Platinum
+}
+
+class Badge {
+    - rate: int
+    + getType(): BadgeType
+    + getRate(): int
+}
+Badge *- BadgeType
+
+class ReputationController {
+    - badgeRates<BadgeType, int>
+    + updateReputation(message)
+}
+ReputationController ..> Badge: create
+ReputationController ..> Writer: addBadge()
+
+enum UserStatus {
+    + Active
+    + Blocked
+}
+
+abstract User {
+    - username: string
+    - password: string
+    - status: UserStatus
+    - notifications: Notification[]
+
+    + isValidPassword(password)
+    + resetPassword(old, new)
+
+    + notify(notification)
+
+    + block()
+    + unblock()
+
+}
+User *- UserStatus
+User -- Notification: notify()
+
+class Writer extends User {
+    - badges: <BadgeType, Badge>
+    - bounties: Bounty[]
+
+    + getReputation(): int
+    + addBounty(bounty)
+    + addBadge(badge)
+    + hasBadge(badgeType): bool
+
+    + searchByAuthor(username): Question[]
+    + searchByTag(tag): Question[]
+    + searchByText(text): Question[]
+
+    + postQuestion(text): Question
+    + postAnswer(text): Answer
+    + acceptAnswer(answer)
+    + comment(message, text): Comment
+
+    + upVote(message)
+    + downVote(message)
+
+    + deleteQuestion(question)
+    + closeQuestion(question)
+    + deleteAnswer(answer)
+    + flag(message)
+
+    # canVoteClose(): bool
+    # canVoteDelete(): bool
+    # canCreateTag(): bool
+}
+Writer ..> SearchCatalog: read / write
+Writer *-- Badge: has
+note left of Writer::delete
+    **delete*/close*** - vote to delete/close
+end note
+
+class Moderator extends Writer {
+    + deleteQuestion(question)
+    + closeQuestion(question)
+    + deleteAnswer(answer)
+    + restoreQuestion(question)
+    + deleteComment(comment)
+}
+
+class Admin extends User {
+    + blockUser(user)
+    + unblock(user)
+}
+Admin ..> Authorization: manages users
+
+class Authorization {
+    - users: User
+    + getUsers(): Writer
+    + registerUser(username, password)
+    + registerModerator(username, password)
+    + registerAdmin(username, password)
+    + login(username, password): User
+}
+Authorization o-- User
+
+abstract Notification {
+    - receiver: User
+    + {abstract} getText(): string
+    + constructor(receiver)
+    + send()
+}
+
+class VoteNotification extends Notification {
+    - receiver: Writer
+    - message: Message
+    + constructor(receiver, message)
+}
+
+class CloseNotification extends Notification {
+    - receiver: Writer
+    - message: Message
+    + constructor(receiver, message)
+}
+
+class AwardBadgeNotification extends Notification {
+    - receiver: Writer
+    - badge: Badge
+    + constructor(receiver, badge)
+}
+
+class System <<Singleton>> {
+    - auth: Authorization
+    - tags: TagsCollection
+    - catalog: Catalog
+    - reputationController: ReputationController
+    + getAuth(): Authorization
+    + getCatalog(): SearchCatalog
+    + getTags(): TagsCollection
+    + getReputationController(): ReputationController
+}
+System ..> Authorization: provides
+System ..> TagsCollection: provides
+System ..> SearchCatalog: provides
+
+@enduml

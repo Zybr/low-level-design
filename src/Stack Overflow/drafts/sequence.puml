@@ -1,0 +1,111 @@
+@startuml
+actor Guest
+actor WriterA
+actor WriterB
+
+== Search ==
+
+Guest -> System++: getCatalog()
+Guest++
+Guest <-- System--: SearchCatalog
+Guest -> SearchCatalog++: getByAuthor/Tag/Text()
+Guest <-- SearchCatalog--: Question[]
+Guest--
+
+== Post question ==
+
+WriterA -> System++: getCatalog()
+WriterA++
+WriterA <-- System--: SearchCatalog
+
+WriterA -> SearchCatalog++: createQuestion()
+WriterA <-- SearchCatalog--: Question
+
+WriterA -> System++: getTags()
+WriterA <-- System--: TagsCollection
+WriterA -> Question++: setTags(tagNames[])
+        Question -> System++: getTags()
+        Question <-- System--: TagsCollection
+        loop tag
+            alt NOT TagsCollection:has(tagName)
+                Question -> TagsCollection++: create(tagName)
+                TagsCollection--
+            end
+            Question -> TagsCollection++: getTag(tagName)
+            Question <-- TagsCollection--: Tag
+            Question -> Tag++: incrementRate()
+                Tag--
+        end
+Question--
+
+WriterA -> Question++: enableBounty()
+Question -> Bounty**: create
+Question--
+WriterA--
+
+== Comment Question ==
+WriterB -> Question++: createComment()
+WriterB++
+    Question -> Comment**: create
+    Question--
+WriterB--
+
+== Post answer ==
+
+WriterB -> Question++:createAnswer()
+WriterB++
+    Question -> Answer**: create
+WriterB--
+Question--
+
+
+== Vote ==
+
+Guest -> Answer++: upVote
+Guest++
+    Answer -> Notification**: create for Answer::author
+    Answer -> Notification++: send()
+        Notification -> WriterB++: notify()
+        WriterB--
+    Notification--
+    Answer -> ReputationController++: updateReputation(answer)
+    Answer--
+        alt WriterB::reputation() = milestone
+            ReputationController -> Badge**: create
+            ReputationController -> WriterB++: addBadge(Badge)
+            WriterB--
+            ReputationController--
+        end
+Guest--
+
+== Accept answer ==
+
+WriterA -> Answer++: accept()
+WriterA++
+    Answer -> Question++: acceptAnswer(Answer)
+    Answer--
+        Question -> Question: status = Answered
+            alt Question::hasBounty()
+                Question -> Answer++: getAuthor()
+                Answer--
+                Question -> WriterB++: addBadge(Question::bounty)
+                WriterB--
+                Question--
+            end
+WriterA--
+
+== Vote of deleting ==
+
+WriterB -> Question++: deleteVote()
+WriterB++
+WriterB--
+    alt WriterB::hasBadge(BadgeType::Gold)
+        alt Question::votes[type = Delete]::count === 3
+            Question -> System++: getCatalog
+            Question <-- System--: SearchCatalog
+            Question -> SearchCatalog++: removeQuestion(Question)
+                SearchCatalog--
+        end
+    end
+Question--
+@enduml

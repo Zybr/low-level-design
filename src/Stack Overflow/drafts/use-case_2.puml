@@ -1,0 +1,72 @@
+@startuml
+left to right direction
+
+actor Guest
+actor AuthenticatedUser
+actor User
+actor Moderator
+actor Admin
+actor System
+
+package StackOverflow {
+    Guest --> (view question)
+    Guest --> (search questions)
+        (search questions) <|-- (search by tag)
+        (search questions) <|-- (search by username)
+        (search questions) <|-- (search by words)
+
+    AuthenticatedUser --> (login)
+    AuthenticatedUser --> (logout)
+    AuthenticatedUser --> (reset password)
+
+    AuthenticatedUser <|-- User
+    User --> (view question)
+    User --> (search questions)
+    User --> (post question)
+        (post question) <.. (add tags): extend
+            (add tags) ..> (update rate of tag): include
+            (add tags) <.. (create new one): extend
+        (post question) <.. (add bounty): extend
+    User --> (modify question)
+        (modify question) <.. (modify bounty)
+        (modify question) <.. (modify tags)
+        (modify question) <.. (add tags)
+
+    User --> (add answer to question)
+        (add answer to question) ..> (send notification): include
+    User --> (add comment)
+        (add comment) <|-- (comment to question)
+        (add comment) <|-- (comment to answer)
+    User --> (add flag)
+        (add flag) <|-- (flag to question)
+        (add flag) <|-- (flag to answer)
+        (add flag) <|-- (flag to comment)
+    User --> (upvote / downvote)
+        (upvote / downvote) <|-- (to question)
+            (to question) ..> (send notification)
+        (upvote / downvote) <|-- (to answer)
+            (to answer) ..> (send notification)
+        (upvote / downvote) <|-- (to comment)
+            (to comment) ..> (send notification)
+        (upvote / downvote) ..> (update user's reputation): include
+    User --> (vote to delete)
+        (vote to delete) <|-- (to delete question)
+        (vote to delete) <|-- (to close question)
+        (vote to delete) <|-- (to delete answer)
+
+    AuthenticatedUser <|-- Moderator
+    (close/reopen question) <-- Moderator
+    (delete/restore question) <-- Moderator
+    (delete answer) <-- Moderator
+
+    AuthenticatedUser <-- Admin
+    (block/unblock user) <-- Admin
+
+    (send notification) <-- System
+        (send notification) <.. (award badge): include
+    (update user's reputation) <.. (award badge): extend
+    (award badge) <-- System
+    (update rate of tag) <-- System
+}
+
+@enduml

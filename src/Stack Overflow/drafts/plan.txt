@@ -1,0 +1,69 @@
+Question
+    Voting
+        Which level of reputation allow voting?
+        How many votes are needed to remove question?
+        Can unregister user vote?
+        Can both questions and answers be voted?
+        Can user change/cancel his vote?
+    Editing
+        Can be topic(question) removed/archived?
+        Can users remove/update their questions/answers at any time?
+    Actual
+        Which achieving are there?
+        Are admins or other roles (excluding registered) users needed?
+        How duplicated / pretty similar questions should be controlled?
+    Additional feature
+        Since that's a kind of social network, can users send direct messages each other and should be that implemented?
+        Do tags have to be implemented?
+        Are there any kind of notifications?
+---
+Search, tags
+Reputation
+    Calculation
+    Moderator access
+Voting
+    Deleted questions
+Bounty questions/answers
+    Calculation
+
+
+Models
+    System
+        - authorization
+        - catalog
+    Authorization
+        Guest
+            -
+        Account
+            - messages: Message[]
+            + getRate(): int
+            + getBudgets()
+        RatesBadges<rate, Badge>
+            -
+        Badge
+            - rate
+            - ?picture
+    Catalog
+        + getTopics(): Question[]
+        + createTopic(question: string)
+        Message
+            - text: string
+            - votes: Vote
+            + getRate(): int
+            Question
+                - answers: Answer[]
+            Answer
+                - author: Account
+                - text: string
+        Vote
+            - author: Account
+            + isUp: bool
+            + isDown: bool
+
+Patterns
+    Singleton - System
+    Repository - Auth, Catalog
+    Factory - create* methods
+    Composite - getRate()
+    Bridge - Users with their own API depending on a role
+    + Observer - Account <-> Notification

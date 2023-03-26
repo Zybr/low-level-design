@@ -1,0 +1,31 @@
+@startuml
+start
+
+:User clicks on the "Ask Question" button;
+:User fills Title and Body fields;
+
+if (Add a tag to the question) then (Yes)
+    if (Does tag already exist?) then (No)
+        if (Account status?) then (Moderator)
+        :Tag created;
+        else (User)
+            if (Sufficient reputation?) then (Yes)
+                :Tag created;
+            else (No)
+                :Tag NOT created;
+            endif
+        endif
+    else (Yes)
+    endif
+else (No)
+endif
+
+if (Post follows terms) then (Yse)
+    :Question successfully posted;
+else (No)
+    :Question not posted;
+endif
+
+stop
+
+@enduml

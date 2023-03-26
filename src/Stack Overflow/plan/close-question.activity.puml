@@ -1,0 +1,24 @@
+@startuml
+start
+
+:The question is opened;
+:Press the "Close question" button;
+
+if (Account status) then(User)
+    if (Sufficient reputation?) then (Yes)
+        :Vote for close question;
+        if (3 or more close votes?) then (Yes)
+            :The question closes;
+        else (No)
+            :Close vote casted;
+        endif
+    else (No)
+        :Close vote NOT casted;
+    endif
+else (Moderator)
+    :The question closes;
+endif
+
+stop
+
+@enduml
