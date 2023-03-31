@@ -39,6 +39,6 @@ export default class GameLog {
   }
 
   public show() {
-    console.table(this.entries.map(entry => entry).reverse())
+    // console.table(this.entries.map(entry => entry).reverse())
   }
 }
