@@ -1,0 +1,121 @@
+@startuml
+== Reserve table ==
+
+Person -> System++: getRestaurants()
+Person++
+return Restaurant[]
+Person -> Restaurant++: getBranches()
+return Branches[]
+
+Person -> Person: choose Branch
+Person -> Branch++: getReceptionists()
+return Receptionist[]
+
+Person -> Period**: define
+Person -> Receptionist++: getFreeTables(Period)
+return Table[]
+Person -> Person: choose Table
+Person--
+[o-> Person++: reserveTable(Branch, Period, Table)
+    Person -> Receptionist++: reserve(Person, Table, Period)
+    Person--
+        Receptionist -> ReservationList++: reserve(Person, Table, Period)
+            ReservationList -> Reservation**
+                Reservation++
+                Reservation -> Reservation--: status = **Pending**
+            ReservationList--
+        Receptionist--
+
+newpage
+== Inform Person about upcoming Reservation ==
+
+[o-> Branch++: informOfReservations()
+    Branch -> ReservationList++: getReservations()
+    return Reservation[]
+    Branch -> Branch: filter upcoming Reservation[]
+    loop Reservation of Reservation[]
+        Branch -> Reservation++: getPerson()
+        return Person
+        Branch -> ReservationNotification**: create for Person
+        Branch -> ReservationNotification++: sent()
+        Branch--
+            ReservationNotification -> Person++: getPhone()
+            return Phone
+            ReservationNotification -> Phone++: pushNotification(Notification)
+            ReservationNotification--
+            Phone--
+    end loop
+
+newpage
+== Take Table ==
+
+[o-> Person++: takeTable(table)
+    Person -> Branch++: getReceptionists()
+    Person <-- Branch--: return Receptionist[]
+    Person -> Receptionist++: getReservedTable(Person)
+        Receptionist -> ReservationList++: getPersonActiveReservation(Person)
+        Receptionist <-- ReservationList--: return Reservation
+        Receptionist -> Reservation++: getTable()
+        return Table
+    return Table
+    Person -> Table++: getSeats()
+    Person <-- Table--: return Seat[]
+    Person -> Seat++: take(Person)
+    Seat--
+    Person--
+
+newpage
+== Make Order ==
+
+Person -> Waiter++: getMenu()
+Person++
+    Waiter -> Branch++: getMenu()
+    return Menu
+    Branch--
+return Menu
+Waiter--
+Person--
+
+[o-> Person++: makeOrder(Item[])
+    Person -> Waiter++: makeOrder(Table, items)
+    Person--
+        Waiter -> ReservationList++: getTableActiveReservation(Table)
+        Waiter <-- ReservationList--: Table
+        Waiter -> Reservation++: addOrder()
+            Reservation -> Order**: create
+            Reservation--
+        Waiter -> Chef++: cookOrder(Order)
+        Waiter <-- Chef--: Meal[]
+        Table <-- Waiter++: addMeal(Meal)
+        Table--
+    Waiter--
+
+newpage
+== Pay order ==
+[o-> Person++: freeTable()
+    Person -> Waiter: getBill()
+        Waiter++
+        Waiter++
+        Waiter -> ReservationList++: getTableActiveReservation(Reservation)
+        Waiter <-- ReservationList--: Reservation
+        Waiter -> Reservation++: getOrder()
+        Waiter <-- Reservation--: Order
+        Waiter -> Order++: makeBill()
+            Order -> Bill**: create
+        Waiter <-- Order--: Bill
+    Person <-- Waiter--: Bill
+
+    Person -> CardPayment**
+        CardPayment++
+        CardPayment -> CardPayment--: status = **Pending**
+    Person -> Wallet++: getCard()
+    Person <-- Wallet--: Card[]
+    Person -> CardPayment: pay(Card)
+        CardPayment++
+        CardPayment -> CardPayment--: status = **Payed**
+    Person -> Table++: getSeats()
+    Person <-- Table--: Seat[]
+    Person -> Seat++: free()
+        Seat--
+    Person--
+@enduml

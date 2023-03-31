@@ -1,0 +1,19 @@
+@startuml
+start
+
+:Guest arrives at restaurant reception;
+
+repeat
+    :Receptionist checks for table availability;
+    backward: Guest waits for empty table;
+repeat while (if table is **not available**)
+
+:Guest sits at the table;
+:Waiter gives the menu to guest;
+:Guest views menu;
+:Guest places an order;
+:Waiter adds order items to order;
+:Waiter sends order to kitchen;
+
+stop
+@enduml

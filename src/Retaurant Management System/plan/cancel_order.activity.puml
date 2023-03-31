@@ -1,0 +1,21 @@
+@startuml
+start
+
+:The guest decides on the order items;
+:The waiter places the order;
+:The guest has to leave due to an emergency;
+:The guest asks the waiter to cancel the order;
+:The waiter checks the order status;
+
+if (Is the order ready?) then (Yes)
+    :The waiter cancels the order;
+    :The waiter packs the order;
+    :The guest performs the payment;
+else (No)
+endif
+
+:The guest leaves the restaurant;
+
+stop
+
+@enduml

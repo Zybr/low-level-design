@@ -1,0 +1,96 @@
+Questions
+    Which roles/employees are there?
+        Manager
+        Waiter
+        Customer
+        ? Food deliverer
+        ? Cooker
+    Should be cooking (calculation of consuming products) be included somehow?
+    Should be time of food preparing included somehow?
+    Team structure (number of members)
+        Does it depend on week day or part of a day?
+    How menu has to be defined?
+        Does it depend on day part?
+    How bill has to be defined?
+        Dishes
+        Drinks
+        Part of day
+    Who and how does make up menu?
+    Does reservation require partial payment in advance?
+    Which kind of payments can be used?
+        - cash
+        - card
+        - other
+    Can the system include several restaurants in different locations?
+    Can restaurants cook takeaway food?
+    How prices should be defined?
+        - depending on products
+        - depending on popularity
+        - by manager
+    Are there any kind of notifications?
+        - for customers about order
+        - for workers about their shift
+
+Models
+    Restaurant
+        - address
+        - employees
+        - work-time
+    Users
+        Manager
+        Waiter
+        Customer
+    Storage
+        Products
+            - name
+            - weight
+    Menu
+        type: Breakfast | Lunch | Supper
+        Dish
+            - price
+            Ingredient
+                - product
+                - weight
+        Drink
+            - price
+            Ingredient
+                - product
+                - weight
+    Schedule
+        - employee
+        - start
+        - end
+    Table
+        - seats: int
+    Reservation
+        - table
+        - start
+    Bill
+        - Items
+    Item/Meal
+        - Dish/Drink
+        - quantity
+
+Patterns
+    Singleton
+        - System
+    Repository
+        - Authorization - users management;
+        - Store - products management;
+    Composite
+        - bill::getCost() -> Item::getCost()
+    Factory: Director + Builder
+        - Bill generation;
+        - Dishes/Drinks preparing;
+    Bridge
+        - Users with different API/Rights/Responsibles to the System
+    Observer
+        - User notifications
+
+---
+Services
+    - delivery
+    - online ordering
+    - online/card payment
+Management
+    ...

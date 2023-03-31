@@ -1,0 +1,34 @@
+@startuml
+left to right direction
+
+(Get person work schedule) <-- Waiter
+(Make order) <-- Waiter
+    (Define table) ..> (Make order): extends
+    note left of (Define table): if that's not take away order
+    (Define person) <.. (Make order): include
+    (Update bill) <.. (Make order): include
+
+Customer --> (Choose branch)
+Customer --> (Get free tables)
+Customer --> (Reserve table)
+    (Reserve table) ..> (Define date & time)
+Customer --> (Cancel reservation)
+Customer --> (Get menu)
+Customer --> (Make order)
+    (Make order) ..> (Choose items): include
+        (Choose items) ..> (Define quantity): include
+Customer --> (Pay bill)
+    (Pay bill) <.. (Pay by card): extend
+    (Pay bill) <.. (Pay by check): extend
+    (Pay bill) <.. (Pay by cash): extend
+
+(Get free tables) <-- Receptionist
+    (Get free tables) ..> (Define date & time): include
+(Reserve table) <-- Receptionist
+
+(Make work schedule) <-- Manager
+
+(Get free tables) <-- System
+(Send reservation notification) <-- System
+
+@enduml

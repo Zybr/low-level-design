@@ -1,0 +1,42 @@
+@startuml
+left to right direction
+actor Manager
+actor Receptionist
+actor Waiter
+actor Guest
+
+package Restaurant {
+    Receptionist --> (Add/Update Tables chart)
+    Receptionist --> (Reserve table)
+    Receptionist --> (Update/cancel reservation)
+
+    Manager --> (Add/modify menu item)
+        (Add/modify menu item) ..> (Add/modify menu section)
+    Manager --> (Add/modify menu section)
+    Manager --> (Set menu item price)
+    Manager --> (Generate report)
+
+    Waiter --> (View menu)
+    Waiter --> (View order)
+    Waiter --> (Place order)
+        (Place order) ..> (Add/update order item): include
+    Waiter --> (Add/update order item)
+    Waiter --> (Process payment)
+        (Process payment) <|.. (Pay bill via card): extend
+        (Process payment) <|.. (Pay bill via check): extend
+        (Process payment) <|.. (Pay bill via cash): extend
+    Waiter --> (Cancel order)
+
+    (Reserve table) <-- Guest
+    (Update/cancel reservation) <-- Guest
+    (View menu) <-- Guest
+    (Place order) <-- Guest
+    (View order) <-- Guest
+    (Add/update order item) <-- Guest
+    (Cancel order) <-- Guest
+    (Pay bill via card) <-- Guest
+    (Pay bill via check) <-- Guest
+    (Pay bill via cash) <-- Guest
+}
+
+@enduml

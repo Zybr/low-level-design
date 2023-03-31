@@ -1,0 +1,379 @@
+@startuml
+class Card {
+    - money: int
+    + getAmount(): int
+    + subtract(amount)
+    + addMoney(amount)
+}
+
+class Wallet {
+    - cards: Card[]
+    - cash: int
+    + getCards(): Card[]
+    + getCashAmount(): int
+    + subtractCash(amount)
+    + addCash(amount)
+}
+Wallet *-- Card: has
+
+class Person {
+    - person
+    - firstName: string
+    - lastName: string
+    - wallet: Wallet
+    + constructor(firstName, lastName)
+
+    + getFirstName(): string
+    + getLastName(): string
+    + getWallet(): Wallet
+
+    + reserveTable(restaurant, period, table?)
+    + takeTable(table)
+    + makeOrder(items)
+    + freeTable()
+
+    + register(username, password)
+}
+Person *-- Wallet: has
+
+enum UserStatus {
+    + Active
+    + Blocked
+}
+
+abstract User {
+    - person: Person
+    - username: string
+    - password: string
+    - status: UserStatus
+    - notifications: Notification
+    + constructor(person, oldPassword, newPassword)
+    + resetPassword(oldPassword, newPassword)
+
+    + notify(notification)
+    + getNotifications(): Notification[]
+
+    + block()
+    + unblock()
+}
+User o--> Person: is account of
+User *-> UserStatus: has
+User -- Notification: notify()
+
+class Waiter extends Employee {
+    + makeOrder(table, items)
+    + getBill(table): Bill
+}
+Waiter ..> ReservationsList: serves orders
+
+class Receptionist extends Employee {
+    + getFreeTables(period): Tables[]
+    + reserve(person, table, period)
+}
+Receptionist ..> ReservationsList: manges reservations
+
+class Employee extends User {
+    - restaurant: Restaurant
+    + constructor(username, password, restaurant)
+    + getRestaurant(): Restaurant
+}
+
+class Manager extends Employee {
+    + addTable(seatsNum: int)
+    + removeTable(table)
+
+    + addMeal(sectionName, product)
+    + removeMeal(meal)
+
+    + supplyProduct(productType, weight)
+
+    + createManager(person, username, password)
+    + createReceptionist(person, username, password)
+    + createWaiter(person, username, password)
+
+    + blockUser(user)
+    + unblockUser(user)
+}
+<> management
+management ..> Storage: manages products
+management ..> Menu: manages sections & itmes
+management ..> TablesList: manages tables
+Manager .. management: manages
+
+class Customer extends User {
+}
+
+class Authorization {
+    - users: User[]
+    + registerManager(restaurant, person, username, password)
+    + registerReceptionist(restaurant, person, username, password)
+    + registerWaiter(restaurant, person, username, password)
+    + registerCustomer(person, username, password)
+}
+Authorization o--> User: manages
+
+abstract class Notification {
+    - user: User
+    # constructor(user)
+    + {abstract} getText(): string
+    + sent()
+}
+
+class ReservationNotification extends Notification {
+    + constructor(user, reservation)
+    + getText(): string
+}
+
+enum ProductType {
+    + meat
+    + water
+    + bread
+    + milk
+    + vegetable
+}
+
+class Product {
+    - type: ProductType
+    - weight: int
+    + constructor(type, weight)
+    + getType(): ProductType
+    + getWeight(): int
+}
+ProductType -* Product: has
+
+class Storage {
+    - products: Set<type, Product>
+    + getProducts(): Product[]
+    + getProduct(type): Product
+    + addProduct(type, weight)
+    + removeProduct(type, weigh)
+}
+Storage o-- Product: keeps
+
+abstract Meal {
+    - products: Set<Product>
+    - price: int
+    + constructor(products, price)
+    + getProducts(): Product[]
+    + setProducts(products)
+    + setPrice(price)
+}
+Meal *-- Product: includes
+
+class Dish extends Meal {
+}
+
+class Drink extends Meal {
+}
+
+class Section {
+    - name: string
+    - meals: Set<Meal>
+    + getName(): string
+    + getMeals()
+    + addMeal(meal)
+    + removeMeal(meal)
+}
+Section o-- Meal: includes
+
+class Menu {
+    - sections: Set<Section>
+    + getSections(): Section[]
+    + addSection(section)
+    + removeSection()
+}
+Menu *-- Section: has
+
+class Seat {
+    - customer: Person | null
+    + take(person)
+    + free(person)
+}
+
+class Table {
+    - seats: Seat[]
+    + addSeat(seat)
+    + removeSeat(seat)
+    + getSeats(): Seat[]
+
+    + makeOrder(waiter, Items[])
+    + getOrder(waiter): Order
+    + free()
+}
+Table *-- Seat: has
+
+class TablesList {
+    - tables: Set<Table>
+    + getTables()
+    + addTable(table)
+    + removeTable(table)
+}
+TablesList o-- Table: manages
+
+enum PaymentStatus {
+    + Pending
+    + Payed
+}
+
+abstract Payment {
+    - amount
+    + constructor(amount)
+    + {abstract} pay()
+}
+Payment *- PaymentStatus: has
+Payment -- Bill: of
+
+class CardPayment extends Payment {
+    + pay(card)
+}
+
+class CashPayment extends Payment {
+    + pay(wallet)
+}
+
+class Item {
+    - meal: Meal
+    - quantity: int
+    + constructor(meal, quantity)
+    + getCost(): int
+}
+
+class Bill {
+    - amount: int
+    - payment: Payment | null
+    + pay(payment)
+    + isPayed()
+}
+
+class Order {
+    - table: Table
+    - items: Item
+    - bill: Bill | null
+    + createItem(meal, quantity)
+    + getCoast(): int
+    + makeBill(): Bill
+}
+Order o-- Item: includes
+Order *-- Bill: has / produces
+
+class Period {
+    - start: DateTime
+    - end: DateTime
+    + constructor(start, end)
+
+    + getStartTime(): DateTime
+    + setStartTime(start)
+
+    + getEndTime(): DateTime
+    + setEndTime(end)
+}
+
+enum ReservationStatus {
+    + Pending
+    + Active
+    + Done
+}
+
+class Reservation {
+    - status: ReservationStatus
+    - person: Person
+    - table: Table
+    - period: Period
+    - order: Order
+    + constructor(person, table, period)
+
+    + getTable(): TablesList
+    + setTable(table)
+
+    + getPeriod(): Period
+    + setPeriod(period)
+
+    + getOrder()
+    + updateOrder(items)
+
+    + cancel()
+    + isActive(): bool
+}
+Reservation *- ReservationStatus
+Reservation o-- Table
+Reservation o-- Period
+Reservation o-- Order
+
+class ReservationsList {
+    - reservations: Set<Reservation>
+    - tables: TablesList
+    + getReservations(): Reservation[]
+    + getPersonActiveReservation(person): Reservation | null
+    + getTableActiveReservation(table): Reservation | null
+
+    + reserve(table, period): Reservation
+
+    + getFreeTables(period): Table[]
+}
+ReservationsList o-- Reservation: manages
+ReservationsList ..> TablesList: use
+note left of ReservationsList::getPersonActiveReservation
+for receptionist
+endnote
+note left of ReservationsList::getTableActiveReservation
+for waiter
+endnote
+
+class Restaurant {
+    - storage: Storage
+    - menu: Menu
+    - tables: TablesList
+    - reservations: ReservationsList
+    - managers: Manager[]
+    - receptionists: Receptionist[]
+    - waiters: Waiters[]
+
+    + getManagers(): Manager[]
+    + addManager(manger)
+
+    + getReceptionists(): Reservation[]
+    + addReceptionist(receptionist)
+
+    + getWaiters(): Waiter[]
+    + addWaiter(waiter)
+
+    + getStorage()
+    + getMenu()
+    + getTablesList(): TablesList
+}
+Restaurant -- Employee: has / belongs
+Restaurant *-- Storage: has
+Restaurant *-- Menu: has
+Restaurant *-- TablesList: has
+Restaurant *-- ReservationsList: has
+
+class RestaurantsList {
+    - restaurants: Set<Restaurant>
+    + getRestaurants(): Restaurant[]
+    + addRestaurant(restaurant)
+    + removeRestaurant(restaurant)
+}
+RestaurantsList o-- Restaurant: manages
+
+class System <<Singleton>> {
+    - auth: Authorization
+    - restaurants: RestaurantsList[]
+    + getAuth(): Authorization
+    + getRestaurants(): RestaurantsList
+
+    + informOfReservations()
+}
+note left of System::inform
+new Notification().send()
+endnote
+System o--> Authorization: provides
+System o--> RestaurantsList: provides
+
+'TODO
+' - remove customer, send notifications as sms / email
+' - address of restaurant
+' - rename restaurant & branch
+' - chef
+'TODO: Scheduling, reports
+
+@enduml
