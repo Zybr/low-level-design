@@ -1,8 +1,8 @@
-import Building from "../implementation/Building";
-import ElevatorSystem from "../implementation/ElevatorSystem";
-import ElevatorCar from "../implementation/ElevatorCar";
-import ElevatorState from "../implementation/Enums/ElevatorState";
-import Passenger from "../implementation/Passenger";
+import ElevatorSystem from "../src/ElevatorSystem";
+import Building from "../src/Building";
+import ElevatorCar from "../src/ElevatorCar";
+import ElevatorState from "../src/Enums/ElevatorState";
+import Passenger from "../src/Passenger";
 
 describe('ElevatorSystem', () => {
   test('Call car', async () => {

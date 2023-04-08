@@ -3,7 +3,6 @@ import Wallet from "./Wallet/Wallet";
 import Branch from "../Branch";
 import Period from "../Reservation/Period";
 import Table from "../Table/Table";
-import { makeLibrarian } from "../../../Library Management/tests/utils";
 import Item from "../Meal/Menu/Item";
 import CardPayment from "../Reservation/Order/Bill/Payment/CardPayment";
 

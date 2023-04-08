@@ -3,7 +3,6 @@ import Van from "./Van";
 import Motorcycle from "./Motorcycle";
 import Car from "./Car";
 import Truck from "./Truck";
-import Vehicle from "../../../Parking Lot/src/Vehicles/Vehicle";
 
 export default class Park {
   private readonly vehiclesByNumber = new Map<string, AbstractVehicle<any>>();

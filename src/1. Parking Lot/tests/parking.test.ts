@@ -1,7 +1,7 @@
 import Factory from "./Factory";
-import { isNumber } from "../../utils";
 import PaymentStatus from "../src/Payment/Enums/PaymentStatus";
 import CashPayment from "../src/Payment/Payments/CashPayment";
+import { isNumber } from "./utils";
 
 describe('Vehicle parking', () => {
   const admin = Factory.makeAdmin();

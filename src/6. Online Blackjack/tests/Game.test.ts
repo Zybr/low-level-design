@@ -4,7 +4,6 @@ import { faker } from "@faker-js/faker";
 import Person from "../src/Users/Person";
 import Address from "../src/Users/Address";
 import Gambler from "../src/Users/Gambler";
-import { randomInt } from "../../utils";
 
 const makeDealer = (): Dealer => {
   return new Dealer(

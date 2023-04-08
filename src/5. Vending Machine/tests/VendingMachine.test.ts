@@ -2,10 +2,10 @@ import Operator from "../src/Operator";
 import MachineFactory from "../src/MachineFactory";
 import ProductsRepository from "../src/ProductsRepository";
 import { faker } from "@faker-js/faker";
-import { randomInt } from "../../utils";
 import Product from "../src/Product";
 
 const productsList = ProductsRepository.getInstance();
+const randomInt = (max: number, min: number = 0): number => Math.floor(min + Math.random() * (max - min));
 
 describe('VendingMachine', () => {
   for (let i = 0; i < 5; i++) {

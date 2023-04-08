@@ -1,10 +1,10 @@
 import ParkingLot from "../src/ParkingLot";
-import { areEqualEntities, isNumber } from "../../utils";
 import Compact from "../src/ParkingSpots/Compact";
 import Handicapped from "../src/ParkingSpots/Handicapped";
 import Large from "../src/ParkingSpots/Large";
 import Moto from "../src/ParkingSpots/Moto";
 import Factory from "./Factory";
+import { areEqualEntities, isNumber } from "./utils";
 
 describe('Parking Lot construction', () => {
   const parking = ParkingLot.getInstance();

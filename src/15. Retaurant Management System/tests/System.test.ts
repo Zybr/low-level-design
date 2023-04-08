@@ -6,7 +6,6 @@ import System from "../src/System";
 import Restaurant from "../src/Restaurant";
 import Address from "../src/Address";
 import { ProductType } from "../src/Meal/Storage/Product/ProductType";
-import { randomInt } from "../../utils";
 import Dish from "../src/Meal/Meals/Dish";
 import Product from "../src/Meal/Storage/Product/Product";
 import Drink from "../src/Meal/Meals/Drink";
@@ -15,6 +14,7 @@ import Period from "../src/Reservation/Period";
 import Reservation from "../src/Reservation/Reservation";
 import Item from "../src/Meal/Menu/Item";
 
+const randomInt = (max: number, min: number = 0): number => Math.floor(min + Math.random() * (max - min));
 const system = System.getInstance();
 let person: Person;
 const storeProducts = {
