@@ -1,0 +1,25 @@
+@startuml
+start
+
+:1. User searches for a group;
+:2. User opens the group;
+:3. User presses the join group button;
+
+if (4. Privacy type) then
+    :5. Private;
+    :6. User is asked to fill required information;
+    :8. Request to join the group is generated;
+
+    if (9. Request accepted?) then (No)
+        :10. User is rejected from the group;
+    else (Yes)
+    endif
+else
+    :7. Public;
+endif
+    :11. User successfully joins the group;
+
+
+stop
+
+@enduml

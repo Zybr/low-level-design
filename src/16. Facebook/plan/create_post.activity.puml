@@ -1,0 +1,46 @@
+@startuml
+start
+
+:User selects "Create post" to compose a new post;
+:"Create post" pop-up opens;
+:User sets the privacy ofr the post audience;
+
+fork
+    :Public;
+fork again
+    :Friend;
+fork again
+    :Only me;
+end fork
+
+:User adds text to the post;
+
+if (Upload media?) then (Yes)
+
+    repeat
+        :Choose media;
+
+        fork
+            :Photo;
+        fork again
+            :Video;
+        fork again
+            :Location;
+        end fork
+
+        :Upload media;
+    repeat while (Add additional media?) is (Yes)
+
+else (no)
+endif
+
+:User presses the "post" button;
+
+if (Any content against terms of service?) then (No)
+    :Post is published;
+else (Yes)
+    :Post is rejected;
+endif
+
+stop
+@enduml

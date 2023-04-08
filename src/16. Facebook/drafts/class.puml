@@ -1,0 +1,343 @@
+@startuml
+class Address {
+    - country: string
+    - state: string
+    - streetAddress: string
+    - zipCode: string
+    + constructor(country, state, streetAddress, zipCode)
+    - getCountry(): string
+    - getState(): string
+    - getStreetAddress(): string
+    - getZipCode(): string
+}
+
+class Profile {
+    - workExperience: string
+    - education: string
+    - address: Address
+    + getWorkExperience(): string
+    + setWorkExperience(experience)
+
+    + getEducation(): string
+    + setEducation(education)
+
+    + getAddress(): Address
+    + setAddress(address)
+}
+Profile *-- Address: has
+note left of Profile: attributes are simplified and normally \nhave to be presented as structures
+
+class FriendsList {
+    - users: Set<User>
+    + getUsers(): User
+    + addUser(user): User
+    + removeUser(user)
+}
+FriendsList -- User: list of friends
+
+class FollowsList {
+    - users: Set<User>
+    - pages: Set<Page>
+    + getUsers(): User[]
+    + adduser(user)
+    + removeUser(user)
+
+    + getPages(): Page[]
+    + addPage(page)
+    + removePage(page)
+}
+
+class Feed {
+    - user
+    + getTopics(): Topic[]
+}
+
+enum UserStatus {
+    + Active
+    + Blocked
+}
+
+abstract BaseUser {
+   - username: string
+   - password: string
+   - status: UserStatus
+
+   + getUsername(): string
+   + changePassword(oldPassword, newPassword)
+   + isValidPassword(password): bool
+   + getStatus(): UserStatus
+}
+
+class User extends BaseUser {
+   - profile: Profile
+
+   - feed: Feed
+   - followsList: FollowsList
+   - friendsList: FriendsList
+
+   --
+   + constructor(username, password)
+
+   -- Getters --
+   + getProfile(): Profile
+   + getFeed(): Feed
+   + getFollowsList(): FollowsList
+   + getFriendsList(): FriendsList
+
+   -- Advanced functions --
+   + requestFriendship(user)
+
+   + createGroup(name)
+   + inviteUser(group, user)
+   + removeUser(group, user)
+
+   + sendMessage(user, text)
+
+   + createTopic(text, title): Topic
+   + addPost(topic, text): Post
+   + sharePost(post, user)
+   + addComment(message:Post | Comment, text): Comment
+}
+User *- UserStatus: has
+User *-- Profile: has
+User -- Feed: is user's interests: \n -follows \n -friends \n -groups
+User *-- FollowsList: has
+
+class Authorization {
+    - users: Map<string, User>
+    + getUsers(): User[]
+    + register(username, password)
+    + login(username, password): User
+}
+Authorization *-- User: manages
+
+class Group {
+    - name: string
+    - admin: User
+    - users: User[]
+    + constructor(admin, name)
+
+    + getAdmin(): User
+
+    + getUsers(): User
+    + addUser(user)
+    + removeUser(user)
+}
+Group o-- User: has
+
+class GroupsCatalog {
+    - groups: Map<string, Group>
+    + getGroups(): Group[]
+    + getUserGroups(user): Group[]
+    + addGroup(author, name): Group
+    + removeGroup(group): Group
+}
+GroupsCatalog *-- Group: manages
+
+abstract Message {
+    - author: User
+    - text: string
+    - createdAt: DateTime
+    - updatedAt: DateTime
+    + constructor(author, text)
+
+    + getAuthor(): User
+    + getText(text: string)
+    + setText(text: string)
+
+    + getCreationTime(): DateTime
+    + getUpdatingTime(): DateTime
+}
+Message o-- User: is authored by
+
+class DirectMessage extends Message {
+    - receiver: User
+    + constructor(author, text, receiver)
+    + getReceiver(): User
+}
+DirectMessage ..> Notification: produces
+
+class PageFilter {
+    + keyword: string
+    + author: User
+}
+note left of PageFilter::keyword
+title/text
+endnote
+
+class MessageFilter {
+    + keyword: string
+    + author: User
+}
+note left of MessageFilter::keyword
+text
+endnote
+
+class Privacy {
+    - ReadableByFriends = 1
+    - WritableByFriends   = 11
+    - ReadableByMembers = 001
+    - WritableByMembers   = 0011
+    - ReadableByGuests = 00001
+    - WritableByGuests    = 000011
+    - flags: int
+
+    - blacklist: Set<User>
+
+
+    + addToBlackList(user)
+    + removeFromBlackList(user)
+
+    + isReadablyByFriends(): bool
+    + setReadablyByFriends(enable): bool
+    + isWritableByFriends(): bool
+    + setWritableByFriends(enable): bool
+
+    + isReadablyByGroupsMembers(): bool
+    + setReadablyByGroupsMembers(enable): bool
+    + isWritableByGroupsMembers(): bool
+    + setWritableByGroupsMembers(enable): bool
+
+    + isReadablyByGuest(): bool
+    + setReadablyByGuest(enable): bool
+    + isWritableByGuest(): bool
+    + setWritableByGuest(enable): bool
+}
+
+abstract Page extends Message {
+    - privacy: Privacy
+    - posts: Post[]
+
+    + getPrivacy(): Privacy
+
+    + getPosts(): Post[]
+    + addPost(author, text): Post
+}
+Page *-- Privacy
+Page *-- Post: has
+
+class PagesCatalog {
+    - pages: <string, Page>
+    + getPages(): Page[]
+    + createPrivatePage(author, title, text): PrivatePage
+    + createTopic(author, title, text): Topic
+}
+
+interface SearchPages {
+    + searchPage(pageFilter): Page[]
+    + searchMessage(messageFilter): Post|Comment[]
+}
+PagesSearchCatalog *-- Page: provides
+PagesSearchCatalog::searchPage --> PageFilter: search by
+PagesSearchCatalog::searchMessage --> MessageFilter: search by
+
+class PagesSearchCatalog extends PagesCatalog implements SearchPages {
+}
+
+class AccessController {
+    + canReadPage(user, page): bool
+    + canWritePage(user, page): bool
+}
+AccessController ..> Page: uses
+AccessController ..> User: uses
+
+class Topic extends Page {
+    - title: string
+    + constructor(author, text, title)
+}
+
+class PrivatePage extends Page {
+}
+
+enum LikeType {
+    + Up
+    + Down
+}
+
+class Like {
+    - author: User
+    - type: LikeType
+    + getAuthor(): User
+    + isUp(): boolean
+}
+Like *- LikeType
+
+class FriendshipRequest {
+    - sender: User
+    - receiver: User
+    + constructor(sender, receiver)
+    + getSender(): User
+    + getReceiver(): User
+
+    + confirm()
+    + reject()
+}
+FriendshipRequest ..> Notification: produces
+FriendshipRequest ..> FriendsList: updates by confirm()
+
+abstract Notification {
+    - receiver: User
+    + {abstract} getText(): string
+    + constructor(receiver)
+}
+
+class FriendshipRequestNotification extends Notification {
+    - request: FriendshipRequest
+    + constructor(receiver, request)
+    + getRequest(): FriendshipRequest
+}
+
+class DirectMessageNotification extends Notification {
+    - message: DirectMessage
+    + constructor(receiver, message)
+    + getMessage(): DirectMessage
+}
+
+class CreatedCommentNotification extends Notification {
+    - comment: Comment
+    + getComment(): Comment
+}
+
+class ShareNotification extends Notification {
+    - post: Post
+    + constructor(receiver, post)
+    + getPost(): Post
+}
+
+abstract PageMessage extends Message {
+    - likes: <string, Like>
+    - comments: Comment[]
+
+    + getComments(): Comment[]
+    + addComment(author, text)
+
+    + getLikes(): Like[]
+    + like(author)
+    + dislike(author)
+    + removeLike(author)
+}
+PageMessage *-- Like: is rated by
+
+class Post extends PageMessage {
+}
+
+class Comment extends PageMessage {
+}
+Comment ..> Notification: produces
+
+class System <<Singleton>> {
+    - auth: Authorization
+    - pagesCatalog: PagesSearchCatalog
+    - groupsCatalog: GroupsCatalog
+    - accessController: AccessController
+    + getAuth(): Authorization
+    + getPagesCatalog(): PagesSearchCatalog
+    + getGroupsCatalog(): GroupsCatalog
+    + getAccessController(): AccessController
+}
+System ..> Authorization: provides
+System ..> PagesSearchCatalog: provides
+System ..> GroupsCatalog: provides
+System ..> AccessController: provides
+
+@enduml

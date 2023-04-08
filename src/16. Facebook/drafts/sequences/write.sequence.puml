@@ -1,0 +1,45 @@
+@startuml
+actor UserA
+actor UserB
+
+== Create topic ==
+[o-> UserA++: createTopic(text, title)
+    UserA -> Topic**: create
+    UserA--
+
+== Post ==
+[o-> UserB++: addPost(topic, text)
+    UserB -> Topic++: addPost(UserB, text)
+    UserB--
+        Topic -> Post**: create
+        Topic--
+            Post++
+            Post -> System++:getSubscriptionsList()
+            Post <-- System--: SubscriptionsList
+            Post -> SubscriptionsList++: createdPostNotify(Post)
+            Post--
+                SubscriptionsList -> SubscriptionsList: define followers
+                SubscriptionsList -> CreatedPostNotification**: create
+                SubscriptionsList--
+                    CreatedPostNotification++
+                    CreatedPostNotification -> UserA++: notify(CreatedPostNotification)
+                    CreatedPostNotification--
+                    UserA--
+        Topic--
+
+== Comment ==
+
+[o-> UserA++: addComment(Post, text)
+    UserA -> Post++: addComment(UserA, text)
+    UserA--
+        Post -> Comment**: create
+        Post--
+            Comment++
+            Comment -> CreatedCommentNotification**: create
+            Comment--
+                CreatedCommentNotification++
+                CreatedCommentNotification -> UserB++: author:notify(CreatedCommentNotification)
+                CreatedCommentNotification--
+                UserB--
+        Post--
+@enduml

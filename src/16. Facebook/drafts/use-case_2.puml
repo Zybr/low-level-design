@@ -1,0 +1,70 @@
+@startuml
+left to right direction
+
+User --> (add/edit/delete work experience)
+    (add/edit/delete work experience) ..> (update **profile**): include
+User --> (add/edit/delete education)
+    (add/edit/delete education) ..> (update **profile**): include
+User --> (add/edit/delete living place)
+    (add/edit/delete living place) ..> (update **profile**): include
+User --> (setup privacy to profile page)
+note right of (setup privacy to profile page): get/restrict access for not friends
+    (setup privacy to profile page) ..> (update **profile**): include
+
+User --> (search)
+    (search) <|-- (search groups): extend
+    (search) <|-- (search pages): extend
+    (search) <|-- (search users): extend
+
+User --> (create/update/delete/share a **page**)
+    (create/update/delete/share a **page**) ..> (send message): include
+    (create/update/delete/share a **page**) <.. (set topic privacy): extend
+    note right of (set topic privacy): define users who can write/read
+
+User --> (make friend request)
+    (make friend request) <.. (respond friend request): extend
+    note right of (respond friend request): response by receiver
+        (respond friend request) ..> (update **friends list**): include
+    (make friend request) ..> (send notification): include
+User --> (respond friend request)
+    (respond friend request) ..> (send notification): include
+User --> (unfriend user)
+    (unfriend user) ..> (send notification): include
+    (unfriend user) ..> (update **friends list**): include
+User --> (block/unblock user)
+    (block/unblock user) ..> (update **group's users**): include
+        (update **group's users**) ..> (update **group**): include
+
+User --> (create/update/delete/share/like a **post**)
+    (create/update/delete/share/like a **post**) ..> (send notification): include
+User --> (create/update/delete/like/comment a **comment**)
+    (create/update/delete/like/comment a **comment**) ..> (send notification): include
+User --> (send message)
+    (send message) ..> (define receivers): include
+    (send message) ..> (send notification): include
+
+User --> (follow/unfollow user)
+    (follow/unfollow user) ..> (update **following list**): include
+User --> (follow/unfollow page)
+    (follow/unfollow page) ..> (update **following list**): include
+
+User --> (leave group)
+    (leave group) ..> (update **group's users**): include
+User --> (ask user inviting in group)
+    (ask user inviting in group) <.. (confirm inviting): extend
+        (confirm inviting) ..> (update **group's users**): include
+        note right of (confirm inviting): confirm by receiver
+User --> (ask user joining in group)
+    (ask user joining in group) <.. (confirm inviting): extend
+
+(send notification) <-- System
+(update **group's users**) <-- System
+(update **friends list**) <-- System
+
+User --> (create/delete **group**)
+    (create/delete **group**) ..> (update **group**): include
+User --> (set group privacy)
+    (set group privacy) ..> (update **group**): include
+note right of (set group privacy): ? define if group-page is readable by not included users
+
+@enduml

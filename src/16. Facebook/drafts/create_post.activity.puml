@@ -1,0 +1,15 @@
+@startuml
+start
+:User searches a topic;
+if (User has access to read topic) then (Yes)
+    :User opens the topic;
+    if (User has access to write) then (Yes)
+        :User create a post;
+        :Create notification of created post for each User's follower;
+    else (No)
+    endif
+else (No)
+endif
+
+stop
+@enduml

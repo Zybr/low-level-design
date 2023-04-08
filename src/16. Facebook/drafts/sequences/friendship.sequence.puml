@@ -1,0 +1,33 @@
+@startuml
+[o-> UserA++: requestFriendship(UserB)
+    UserA -> FriendshipRequest**
+    UserA--
+        FriendshipRequest++
+            FriendshipRequest -> FriendshipRequestNotification**: create
+            FriendshipRequestNotification++
+            FriendshipRequest -> FriendshipRequest: status **Pending**
+            FriendshipRequestNotification -> UserB--: notify(FriendshipRequestNotification)
+            FriendshipRequest--
+                alt accept
+                    UserB++
+                    UserB -> FriendshipRequest++: accept()
+                    UserB--
+                        FriendshipRequest -> UserA++:getFriendsList()
+                        FriendshipRequest <-- UserA--: FriendsList
+                        FriendshipRequest -> FriendsList++: addUser(UserA)
+                        FriendshipRequest -> FriendshipRequest: status **Accepted**
+                        FriendsList--
+                        FriendshipRequest -> FriendshipNotification**: create
+                            FriendshipRequestNotification++
+                            FriendshipRequestNotification -> UserB: notify()
+                            FriendshipRequestNotification--
+                        FriendshipRequest--
+                else reject
+                    UserB -> FriendshipRequest++: reject()
+                    UserB++
+                    UserB--
+                        FriendshipRequest -> FriendshipRequest: status **Rejected**
+                        FriendshipRequest--
+                end
+
+@enduml

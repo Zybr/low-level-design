@@ -1,0 +1,39 @@
+@startuml
+actor UserA
+actor UserB
+participant InviteRequest
+participant InviteRequestNotification
+participant Group
+
+== Create group ==
+[o-> UserA++: createGroup(name)
+    UserA -> Group**: create
+UserA--
+
+== Invite participant ==
+
+[o-> UserA++: inviteUser(user)
+    UserA -> InviteRequest**: create
+    UserA--
+        InviteRequest++
+        InviteRequest -> InviteRequestNotification**: create
+        InviteRequestNotification++
+        InviteRequest -> InviteRequest--: status = **Pending**
+        InviteRequestNotification -> UserB++: notify()
+        InviteRequestNotification--
+        alt accept
+            UserB -> InviteRequest++: accept()
+                InviteRequest -> Group++: addUser(userB)
+                InviteRequest -> InviteRequest!!: status = **Accepted**
+                InviteRequest--
+                Group -> SubscriptionsList++: followUser(UserB, Group)
+                Group--
+                SubscriptionsList--
+        else reject
+            UserB -> InviteRequest++: reject()
+                InviteRequest -> InviteRequest!!: status = **Rejected**
+                InviteRequest--
+                Group--
+        end
+        UserB--
+@enduml

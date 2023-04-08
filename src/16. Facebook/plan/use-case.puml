@@ -1,0 +1,35 @@
+@startuml
+left to right direction
+
+User --> (Send friend request)
+    (Send friend request) ..> (Send new friend request notification): include
+User --> (Add/Update profile)
+User --> (Accept/Reject friend request)
+User --> (Follow/Unfollow user)
+User --> (Create/JoinLeave group)
+
+User --> (Add/Update/Delete Post)
+    (Add/Update/Delete Post) ..> (Send new post notification): include
+User --> (Create/LikeFollow/Share/page)
+User --> (Add/update/Delete/Like comment)
+    (Add/update/Delete/Like comment) ..> (Send new comment notification): include
+
+User --> (Search users/groups/pages/posts)
+
+User --> (Send message)
+    (Send message) ..> (Send message notification): include
+User --> (Accept/Reject group join invitation)
+User --> (Update privacy)
+
+"Page/Group Admin" --|> User
+"Page/Group Admin" --> (Enable/Disable page)
+"Page/Group Admin" --> (Block/Unblock user)
+"Page/Group Admin" --> (Delete group)
+"Page/Group Admin" --> (Change group's privacy)
+
+(Send new friend request notification) <-- System
+(Send new post notification) <-- System
+(Send new comment notification) <-- System
+(Send message notification) <-- System
+
+@enduml

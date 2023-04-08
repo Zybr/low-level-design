@@ -1,0 +1,74 @@
+Models
+
+    Groups
+        - users: User
+
+        User
+            - username
+            - password
+            - page: PersonalPage
+            - friends: User[]
+            -* topics: Topic[]
+            -* message: Message[] // Received
+    Page
+        - author: User
+        - title
+        - description
+        - likes: Like[]
+
+        PersonalPage
+
+        Topic
+            - posts: Post
+
+            Post
+                - author: User
+                - text
+                - ? attachments
+                - likes: Like
+
+    Like
+        - author: User
+
+    Message
+
+        FriendRequest
+            - from: User
+            - to: User
+
+
+        TextMessage
+            - from: User
+            - to: User
+            - text
+
+    Feed
+        * new user->groups->users->topics
+        * new user->friends->posts
+        * ? new topics[liked]->posts
+
+Questions:
+    User abilities
+        Can user remove/edit topic/posts?
+        Can user limit access to topic/private-page?
+        ! Can user like post/topic?
+            Does a like effect feed?
+        ! Can user make attachments to a topic/post/message such as image/video/cloud-resource?
+    Search
+        ! Can topics be search by words of
+            title,
+            description,
+            author,
+            rating (number of likes / posts)
+    Roles
+        ! Is there an admin who can manage users?
+        ! Is there a moderator who can manage the posts/topics?
+        Can user have some special statuses (excluding active/blocked)?
+    Collision
+        Is topic title uniq?
+
+Patterns
+    Singleton - System
+    Repository - Authorization, users management
+    Factory - producing posts/messages
+    Observer - receiving direct messages
