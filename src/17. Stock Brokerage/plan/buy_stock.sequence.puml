@@ -1,0 +1,33 @@
+@startuml
+
+start
+
+:Member selects the stock to buy;
+:Member selects the order type;
+
+fork
+    :Market;
+fork again
+    :Limit;
+fork again
+    :Stop loss;
+fork again
+    :Stop limit;
+end fork
+
+:Member selects the number of stock;
+:Member selects the time price limit;
+:Member selects time enforcement;
+
+if (Check if enough deposit is available) then (Yes)
+    :Funds deducted from the account;
+    :Order sent to the stock exchange;
+    :Acknowledgement received from exchange;
+    :Order placed message sent to the customer;
+else (No)
+    :Show error message;
+endif
+
+stop
+
+@enduml

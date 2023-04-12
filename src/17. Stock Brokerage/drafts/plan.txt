@@ -1,0 +1,82 @@
+Models
+
+    Logs
+        - price
+        - dateTime
+
+    StockHistory
+        - logs: Logs[]
+
+    Stock
+        - name
+        - ?owner
+        - price
+        - history
+
+    Range
+        - min: int | min
+        - max: int | max
+
+    Notification
+        - item: Item
+        - range: Range
+
+    Item
+        - stock: Stock
+        - quantity: int
+        - range: Range
+        + buy(quantity)
+        + sell(quantity)
+
+    Offer
+        - profile: Profile
+        - item: Item
+
+    Market
+        - stocks: Stock[]
+        - buyOffers: Item[]
+        - sellOffers: Item[]
+
+    Portfolio
+        - items = Item[]
+        - setLimits(stock, range)
+        + offerSell(stock, quantity)
+        + offerBuy(stock, quantity)
+
+    ?Display
+
+    User
+        - portfolios: Portfolio[]
+    -
+        stock
+        stock position
+        inventory
+            stock items
+        watchlist
+            stock quotes
+        lot
+
+Questions
+    Should I care about price shaping?
+    Search
+        Which attributes can be used for stocks search?
+            - price: <, =, >
+            - ?name
+            - ?owner
+    Collision/Transactions
+        How to solve simultaneous operations (buy/sell)?
+    Process
+        How people order buying/selling?
+        Can user change/remove offer?
+    Roles
+        Is there any kind of admin who can manage users/stocks?
+    Display
+        Is it enough to provide history of Stocks?
+
+Pattern
+    Singleton - System
+    Observer - User receives notifications
+    Factory - Make Stock items
+    Repository - Manage Stocks, mange Items
+    Composite - Provide total Portfolio price
+

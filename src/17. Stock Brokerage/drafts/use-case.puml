@@ -1,0 +1,32 @@
+@startuml
+left to right direction
+
+User --> (Make watchlist)
+    (Make watchlist) ..> (Add stock quote): include
+User --> (Remove watchlist)
+User --> (Make order)
+    (Make order) <|-- (Market order)
+    (Make order) <|-- (Limit order)
+        (Limit order) ..> (Set max of buy): include
+        (Limit order) ..> (Set min of sell): include
+    (Make order) <|-- (Stop-loss order)
+        (Stop-loss order) ..> (Set min of sell): include
+    (Make order) <|-- (Stop-limit order)
+        (Stop-limit order) ..> (Set min of sell): include
+        (Stop-limit order) ..> (Set max of sell): include
+User --> (Put/withdrawal money)
+    (Put/withdrawal money) ..> (Update private deposit): include
+    (Put/withdrawal money) <|-- (By checks)
+    (Put/withdrawal money) <|-- (By wire transfer)
+    (Put/withdrawal money) <|-- (By electronic bank transfer)
+
+(Notify of trade) <-- System
+(Buy stocks from order) <-- System
+    (Update private deposit) <.. (Buy stocks from order): include
+        (Notify of trade) <.. (Buy stocks from order)
+    (Update private stocks) <.. (Buy stocks from order): include
+(Sell stocks to order) <-- System
+    (Update private deposit) <.. (Sell stocks to order): include
+        (Notify of trade) <.. (Sell stocks to order)
+    (Update private stocks) <.. (Sell stocks to order): include
+@enduml

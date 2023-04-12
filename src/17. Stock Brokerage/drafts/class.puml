@@ -1,0 +1,289 @@
+@startuml
+
+enum UserStatus {
+    + Active
+    + Blocked
+    + Canceled
+}
+
+abstract User {
+    - username: string
+    - password: string
+    - status: UserStatus
+    - notification: Notification[]
+    + constructor(username, password)
+
+    + isValidPassword(password): bool
+    + setPassword(oldPassword, newPassword)
+
+    + notify(notification)
+
+    + block()
+    + unblock()
+    + cancel()
+}
+User *-- UserStatus
+
+class Admin extends User {
+    + blockUser(user)
+    + unblockUser(user)
+}
+
+class Watchlist <<Repository>> {
+    - stocks: Set<string>
+    + addStock(name)
+    + removeStock(name)
+    + getStocksPrices(): Map<name, price>
+}
+Watchlist ..> Stock: provides
+
+enum PaymentStatus {
+    + Pending
+    + Payed
+}
+
+abstract MoneySource {
+    - money: int
+    + addMoney(amount)
+    + subtractMoney(amount)
+}
+
+class Card extends MoneySource {
+}
+
+abstract Payment {
+    - amount: int
+    - status: PaymentStatus
+    + constructor(amount)
+
+    + getAmount(): int
+    + getStatus(): PaymentStatus
+    + {abstract} pay(source)
+}
+Payment *- PaymentStatus
+Payment ..> MoneySource: uses
+
+class CardPayment extends Payment {
+    + pay(card)
+}
+
+class Deposit {
+    - amount: int
+    + getAmount(): int
+    + subtractMoney(amount)
+    + applyPayment(payment)
+    + transferTo(deposit, quantity)
+}
+Deposit ..> Payment: apply()
+
+class Portfolio <<Repository>> {
+    - items: Set<Stock, StockItem>
+    + getItems(): StockItem[]
+    + addItem(item)
+}
+Portfolio o-- StockItem: manages
+
+class Member extends User {
+    - deposit: Deposit
+    - watchlist: Watchlist
+    - portfolio: Portfolio
+    + getDeposit(): Deposit
+    + getWatchlist(): Watchlist
+    + getPortfolio(): Portfolio
+
+    + placeOrder(stock, quantity): OrderBuilder
+    + getOrders(): Order[]
+    + cancelOrder(order)
+
+}
+Member *-- Watchlist: has
+Member *-- Deposit: has
+Member o-- Portfolio: has
+
+class Authorization <<Repository, Factory>> {
+    - users: Map<string, User>
+    + registerAdmin(username, password)
+    + registerMember(username, password)
+    + login(username, password): User
+}
+Authorization o-- User: manages
+
+class Stock {
+    - price: int
+    - name: string
+    + constructor(name, price)
+
+    + getName(): string
+
+    + getPrice(): int
+    + setPrice(price)
+}
+
+class StocksInventory <<Repository, Factory>> {
+    - stocks: Map<string, Stock>
+
+    + getStocks(): Stock[]
+    + getStock(name): Stock
+
+    + createStock(name, price)
+    + deleteStock(name)
+}
+StocksInventory o-- Stock: manages
+
+class StockItem {
+    - stock: Stock
+    - quantity: int
+    + constructor(stock, quantity)
+
+    + getStock(): Stock
+    + getQuantity(): int
+
+    + add(item)
+    + subtract(item): Item
+
+    + getCost(): int
+    + getCostDiff(item): int
+}
+StockItem o-- Stock: quantity of
+
+
+enum OrderStatus {
+    + Pending
+    + Canceled
+    + Completed
+}
+
+abstract Order {
+    - stockExchange: StockExchange
+    - owner: Member
+    - item: StockItem
+    - type: OrderType
+    - status: OrderStatus
+    + constructor(stockExchange, owner, item)
+
+    + getOwner(): Member
+    + getItem(): StockItem
+
+    + isBuying(): bool
+    + isSelling(): bool
+
+    + canBeProcessed(): bool
+
+    + cancel()
+    + {abstract} resolve(order)
+
+    + isCompleted()
+    + isPending()
+}
+Order *-- OrderStatus
+Order *-- OrderType
+Order o-- StockItem
+
+enum OrderType {
+    + Buy
+    + Sell
+}
+
+class MarketOrder extends Order {
+}
+
+class StopLossOrder extends Order {
+    - minSell: int
+    + constructor(minSell)
+
+    + getMinSell(): int
+}
+
+class LimitOrder extends Order {
+    - minSell: int
+    - maxBuy: int
+    + constructor(maxBuy, minSell)
+
+    + getMaxBuy(): int
+    + getMinSell(): int
+}
+
+class StopLimitOrder extends Order {
+    - minSell: int
+    - maxSell: int
+    + constructor(minSell, maxSell)
+
+    + getMinSell(): int
+    + getMaxSell(): int
+}
+
+class OrderBuilder <<Factory>> {
+    - owner: Member | null
+    - stock: Stock | null
+    - quantity: int
+    + create(owner, stock, quantity): this
+
+    + limitOrder(minSell, maxBuy): LimitOrder
+    + stopLimitOrder(minSell, maxSell): StopLimitOrder
+    + marketOrder(type): MarketOrder
+    + stopLossOrder(minSell): StopLossOrder
+
+    - reset()
+}
+
+interface StockObserver {
+    + createStock(stock)
+    + notifyChanged(stock)
+    + notifyDeleted(stock)
+}
+
+class StockExchange <<Repository>> implements StockObserver {
+    - memberOrders: Map<Member, Set<Order>>
+    - stockOrder: Map<Stock, Set<Order>>
+
+    + getMemberOrders(Member): Order[]
+    + getStockOrders(stock): Order[]
+
+    + buildOrder(owner, stock, quantity): OrderBuilder
+    + add(order)
+    + remove(order)
+
+    - processOrder(order)
+}
+StockExchange *-- Order: manges
+StockExchange -- OrderBuilder: creates orders
+StockExchange ..> Notification: generates
+note left of StockExchange::processOrders
+?
+end note
+
+abstract Notification {
+    - receiver: Member
+    + constructor(receiver)
+}
+
+class OrderCloseNotification extends Notification {
+    - order: Order
+    + constructor(order)
+
+    + getOrder(): Order
+}
+
+class DepositChangedNotification extends Notification {
+    - change: int
+    - result: int
+    + constructor(change, result)
+
+    + getChange(): int
+    + getResult(): int
+}
+
+
+class System {
+    - auth: Authorization
+    - stockInventory: StocksInventory
+    - stockExchange: StockExchange
+    + getAuth(): Authorization
+    + getStockInventory(): StocksInventory
+    + getStockExchange(): StockExchange
+}
+System ..> Authorization: provides
+System ..> StocksInventory: provides
+System ..> StockExchange: provides
+
+@enduml

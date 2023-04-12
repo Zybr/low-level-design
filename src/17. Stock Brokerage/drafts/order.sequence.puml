@@ -1,0 +1,46 @@
+@startuml
+== Create Buying Market Order ==
+
+[o-> Buyer++: placeOrder(Stock, quantity)
+    Buyer -> System++: getMarket()
+    Buyer <-- System--: StockExchange
+    Buyer -> StockExchange++: buildOrder(Buyer, Stock, quantity)
+    Buyer <-- StockExchange--: BuildOrder
+    <-- Buyer--: BuildOrder
+
+[o-> BuildOrder++: marketOrder(type = Buy)
+    BuildOrder -> MarketOrder**: create
+    BuildOrder -> System++: getMarket()
+    BuildOrder <-- System--: StockExchange
+        BuildOrder -> StockExchange++: add(MarketOrder)
+        BuildOrder--
+        StockExchange--
+
+== Process Buying Market Order ==
+    StockExchange -> StockExchange++: get **Selling** Orders by Stock
+    opt there are orders with required stock
+        MarketOrder++
+        group while NOT MarketOrder.isCompleted() [orders => Order]
+            StockExchange -> MarketOrder: resolve(order)
+            StockExchange--
+                MarketOrder -> Order++: getItem()
+                MarketOrder <-- Order--: SocketItem
+                    MarketOrder -> SocketItem++: getCostDiff(markerItem)
+                    MarketOrder <-- SocketItem--: cost
+                    MarketOrder -> Order++: getOwner()
+                    MarketOrder <-- Order--: Owner
+                    MarketOrder -> Buyer++: getDeposit()
+                    MarketOrder <-- Buyer--: BuyerDeposit
+                    MarketOrder -> Seller++: getDeposit()
+                    MarketOrder <-- Seller--: SellerDeposit
+                    MarketOrder -> BuyerDeposit++: transferTo(SellerDeposit, cost)
+                        SellerDeposit++
+                        BuyerDeposit -> DepositChangedNotification**: create
+                        SellerDeposit -> DepositChangedNotification**: create
+                        BuyerDeposit--
+                        SellerDeposit--
+        end group
+        MarketOrder -> OrderCloseNotification**: create
+        MarketOrder--
+    end opt
+@enduml

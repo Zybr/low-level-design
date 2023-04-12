@@ -1,0 +1,45 @@
+@startuml
+start
+
+:Process order;
+
+fork
+    :**MarketOrder**;
+fork again
+    :**StopLossOrder**;
+    :Get price of the order stock;
+    if (price < **StopLossOrder**.min) then(yes)
+    else (no)
+        stop
+    endif
+fork again
+    :**LimitOrder**;
+    :Get price of the order stock;
+    if (price < **LimitOrder**.min OR **LimitOrder**.max < price) then(yes)
+    else (no)
+        stop
+    endif
+fork again
+    :**StopLimitOrder**;
+    :Get price of the order stock;
+    if (**StopLimitOrder**.min <= price <= **StopLimitOrder**.max) then(yes)
+    else (no)
+        stop
+    endif
+fork end
+
+if (order has **buy** type) then (yes)
+    :Find **sell orders** with the same stock;
+else (no)
+    :Find **buy orders** with the same stock;
+endif
+
+repeat
+    :Resolve **[Processing]Order** by **order**;
+repeat while (
+    There are orders
+    AND **MarketOrder** is NOT completed
+) is (Not completed)
+
+stop
+@enduml

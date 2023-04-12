@@ -1,0 +1,35 @@
+@startuml
+left to right direction
+
+Member --> (Create account)
+Member --> (Cancel membership)
+Member --> (Update account)
+Member --> (Login/Logout)
+Member --> (Cancel order)
+Member --> (Create/update wishlist)
+Member --> (Add stock to wishlist)
+Member --> (View stock positions)
+Member --> (Search stock inventory)
+Member --> (Place order)
+    (Place order) <|-- (Place stop loss order)
+    (Place order) <|-- (Place limit order)
+    (Place order) <|-- (Place market order)
+    (Place order) <|-- (Place stop limit order)
+Member --> (Deposit/withdraw money)
+    (Deposit/withdraw money) ..> (Transaction)
+        (Transaction) <|-- (Electronic bank transfer)
+        (Transaction) <|-- (Wire transfer)
+        (Transaction) <|-- (Check transfer)
+
+
+(Create account) <-- Admin
+(Cancel membership) <-- Admin
+(Update account) <-- Admin
+(Login/Logout) <-- Admin
+(Block/unblock member) <-- Admin
+
+(Send deposit/withdrawal status change notification) <-- System
+(Send order status change notification) <-- System
+(Fetch stocks quotes from stock exchange) <-- System
+@enduml
+
