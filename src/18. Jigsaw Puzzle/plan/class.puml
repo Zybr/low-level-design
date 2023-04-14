@@ -1,0 +1,25 @@
+@startuml
+class PuzzleSolver {
+    + matchPieces(): Puzzle
+}
+PuzzleSolver --> Puzzle
+
+class Puzzle {
+    - board: Piece[][]
+    - free: Piece[]
+    + insertPieces(pieces, row, column): void
+}
+Puzzle *-- Piece
+
+class Piece {
+    - sides: Side[]
+    + checkCorner(): bool
+    + checkEdge(): bool
+    + checkMiddle(): bool
+}
+Piece *-- Side
+
+class Side {
+    - edge: Edge
+}
+@enduml

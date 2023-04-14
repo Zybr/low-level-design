@@ -1,0 +1,41 @@
+@startuml
+class Puzzle {
+    - board: Piece[][]
+    - free: Set<Piece>
+    + constructor(width, height)
+
+    + getFreePieces(): Piece[]
+    + doesMatch(piece, row, column): bool
+    + insertPieces(piece, row, column): void
+    + isCompleted(): bool
+}
+Puzzle *-- Piece
+Puzzle ..> PiecesGenerator: generate()
+
+class PiecesGenerator {
+    + generate(width, height): Piece[][]
+}
+
+class Piece {
+    - sides: Side[]
+    + isCorner(): bool
+    + isEdge(): bool
+    + isSide(): bool
+}
+Piece *-- Side
+
+enum Edge {
+    + Indentation,
+    + Extrusion,
+    + Flat
+}
+
+class Side {
+    - edge: Edge
+    - shape: int
+    + constructor(edge, shape)
+    + doesMatch(side): bool
+}
+Side *-- Edge
+
+@enduml

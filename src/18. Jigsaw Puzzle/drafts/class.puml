@@ -1,0 +1,36 @@
+@startuml
+
+class Board {
+    - pieces: Piece[]
+}
+Board *-- Piece: has
+
+class Piece {
+    - sides: Map<SidePosition, Side>
+    + doesMatch(SidePosition, piece): bool
+}
+Piece *-- Side
+
+enum SidePosition {
+    + Left
+    + Right
+    + Top
+    + Bottom
+}
+
+abstract Side {
+    - position: SidePosition
+}
+Side *- SidePosition
+
+class IndentationSide extends Side {
+}
+
+class ExtrusionSide extends Side {
+}
+
+class FlatSide extends Side {
+}
+
+
+@enduml

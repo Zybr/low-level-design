@@ -1,0 +1,28 @@
+How to check if piece has correct position?
+    Original picture has positions
+    Compare piece with its position by id/number
+Should we care how split picture on pieces?
+Should I consider possible form/types of pieces?
+
+Model
+    Position
+        id
+    Piece
+        position_id
+        ? side
+
+    Board
+        - positions: Position[][]
+        + putPiece(piece): bool
+        + isCompleted()
+
+    Game
+        - board
+        - pieces
+
+    System
+        + createGame(size, picture?): Game
+
+Patterns
+    Singleton - System
+    Factory - make game/pieces
