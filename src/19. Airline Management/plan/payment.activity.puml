@@ -1,0 +1,26 @@
+@startuml
+start
+
+:1. The customer initiates the payment;
+repeat
+    :2. The system asks for the payment;
+
+    fork
+        :3. Customer provides their credit card;
+        :5. The customer enters the PIN;
+    fork again
+        :4. The customer pays cash;
+    fork end
+
+repeat while (6. Is the Transaction successful) is (No)
+:7. Flight reservation is completed;
+:8. Customer receives a notification;
+
+fork
+    :9. Through email;
+fork again
+    :10. Through sms;
+fork end
+
+stop
+@enduml

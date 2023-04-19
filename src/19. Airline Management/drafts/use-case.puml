@@ -1,0 +1,58 @@
+@startuml
+left to right direction
+
+Customer --> (Search flights)
+    (Search flights) <|-- (Search by date)
+    (Search flights) <|-- (Search by departure airport)
+    (Search flights) <|-- (Search by destination airport)
+
+Customer --> (View flight)
+    (View flight) <.. (View seats): extend
+    (View flight) <.. (View departure): extend
+        (View departure) <.. (View airport): extend
+        (View departure) <.. (View time): extend
+    (View flight) <.. (View arrival time): extend
+        (View arrival time) <.. (View airport): extend
+        (View arrival time) <.. (View time): extend
+
+Customer --> (Make reservation)
+    (Make reservation) ..> (Choose seats): include
+    (Make reservation) ..> (Pay reservation): include
+    (Make reservation) ..> (Send creating \n of reservation notification): include
+        (Send creating \n of reservation notification) --|> (Send notification)
+Customer --> (Pay reservation)
+    (Pay reservation) <|-- (Pay by card)
+    (Pay reservation) <|-- (Pay by cash)
+Customer --> (Cancel reservation)
+    (Cancel reservation) ..> (Pay back): include
+
+(Make reservation) <-- FrontDeskOfficer
+(Pay reservation) <-- FrontDeskOfficer
+(Create itinerary) <-- FrontDeskOfficer
+    (Choose flights) <.. (Create itinerary): include
+
+(Add / remove aircraft) <-- Admin
+    (Update airline) <.. (Add / remove aircraft): include
+
+(Add / update / cancel flight) <-- Admin
+    (Update flight) <.. (Add / update / cancel flight): include
+    (Update schedule) ..> (Add / update / cancel flight): extend
+        (Send updating / canceling \n of flight notification) <.. (Update schedule): include
+            (Send notification) <|-- (Send updating / canceling \n of flight notification)
+(Assign pilots to flight) <--Admin
+    (Update flight) <.. (Assign pilots to flight): include
+(Assign crew members to flight) <--Admin
+    (Update flight) <.. (Assign crew members to flight): include
+
+(View assigned flight) <-- CrewMember
+(View flight) <.. (View assigned flight): include
+
+CrewMember <|-- Pilot
+CrewMember <|-- Steward
+
+(Update schedule) <-- System
+(Send notification) <-- System
+(Pay back) <-- System
+
+
+@enduml

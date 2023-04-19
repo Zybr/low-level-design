@@ -1,0 +1,69 @@
+@startuml
+
+== Choose Flight ==
+
+Customer++
+Customer -> Airline++: getSchedule()
+Customer <-- Airline--: Schedule
+Customer -> SearchFilter**: create
+Customer -> SearchFilter++: setDepartureAirport()
+SearchFilter--
+Customer -> Schedule++: search(filter)
+Customer <-- Schedule--: Flight[]
+Customer -> Customer: choose flight
+Customer--
+
+== Choose Seats ==
+
+Customer -> Airline++: getItinerariesCatalog()
+Customer++
+Customer <-- Airline--: ItinerariesCatalog
+Customer -> ItinerariesCatalog++: getFreeSeats(flight)
+Customer <-- ItinerariesCatalog--: Seat[]
+Customer -> Customer: Choose seats
+Customer -> Customer: Choose Passengers
+Customer--
+
+== Make Itinerary ==
+
+[o-> Customer++: makeItinerary(flight, passengerSeats)
+    Customer++
+    Customer -> Airline++: getItinerariesCatalog()
+    Customer <-- Airline--: ItinerariesCatalog
+    Customer -> ItinerariesCatalog++: createItinerary(customer)
+        ItinerariesCatalog -> Itinerary**: create
+    Customer <-- ItinerariesCatalog--: Itinerary
+    Customer--
+
+== Make Reservation ==
+
+loop
+Customer -> Itinerary++: createReservation(flight, passengerSeats)
+    Itinerary -> Reservation**: create
+    Itinerary -> Ticket**: create of Reservation
+Customer <-- Itinerary--: Ticket
+end
+Customer--
+
+== Confirm Itinerary ==
+
+[o-> Customer++: confirmItinerary(Itinerary)
+    Customer -> Itinerary++: getCost()
+    Customer <-- Itinerary--: cost
+    Customer -> Payment**: create by cost
+        Payment++
+        Payment -> Payment--: status = **Pending**
+    Customer -> Wallet++: subMoney(amount of cost)
+        Wallet -> Wallet--: reduce amount
+    Customer -> Payment++:  pay(amount of cost)
+        Payment -> Payment--: status = **Payed**
+    Customer -> Itinerary++: confirm(Payment)
+        Itinerary++
+        loop reservation of Itinerary->reservations
+            Itinerary -> ReservedNotification**: create
+                ReservedNotification++
+                Customer <-- ReservedNotification--: notify(notification)
+        end
+        Itinerary--
+    Customer--
+@enduml

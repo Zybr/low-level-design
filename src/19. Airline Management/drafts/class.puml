@@ -1,0 +1,287 @@
+@startuml
+
+abstract Seat {
+    - price: int
+    + constructor(price)
+
+    + getPrice(): num
+}
+
+class SeatRegular extends Seat {
+}
+
+class SeatBusiness extends Seat {
+}
+
+class Aircraft {
+    - regularSeats: Map<int, SeatRegular>
+    - businessSeats: Map<int, SeatBusiness>
+    + constructor(regularSeatsNum, businessSeatsNum)
+
+    + getRegularSeats(): SeatRegular[]
+    + getBusinessSeats(): SeatBusiness[]
+}
+Aircraft *--> Seat: has
+
+class Park <<Repository>> {
+    - aircrafts: Aircraft[]
+    + addAircraft(aircraft)
+    + removeAircraft(aircraft)
+}
+Park *-- Aircraft: keeps
+
+class CrewMember extends User {
+    + getAssignedFlights(): Flight[]
+}
+'CrewMember ..> Schedule: getMemberFlights()
+
+class Pilot extends CrewMember {
+}
+
+class Steward extends CrewMember {
+}
+
+class Crew {
+   - pilots: Pilot[]
+   - stewards: Steward[]
+   + constructor(pilots, stewards)
+
+   + getPilots(): Pilot[]
+   + getStewards(): Steward[]
+}
+Crew *-- CrewMember: consists of
+
+class Address {
+    - country: string
+    - state: string
+    - streetAddress: string
+    - zipCode: string
+    + constructor(country, state, streetAddress, zipCode)
+}
+
+class Airport {
+    - address: Address
+    + constructor(address)
+
+    + getAddress(): Address
+}
+Airport *-- Address: has
+
+class WayPoint {
+    - time: DateTime
+    - airport: Airport
+
+    + constructor(time, airport)
+
+    + getTime(): DateTime
+    + getAirport(): Airport
+}
+WayPoint o--> Airport: placed
+
+enum FlightStatus {
+    - Pending
+    - Active
+    - Completed
+    - Canceled
+}
+
+class Flight {
+    - status: FlightStatus
+    - aircraft: Aircraft
+    - crew: Crew
+    - departure: WayPoint
+    - arrival: WayPoint
+
+    + constructor(aircraft, crew, departure, arrival)
+
+    + getAircraft(): Aircraft
+    + getCrew(): Crew
+    + getDeparture(): WayPoint
+    + getArrival(): WayPoint
+
+    + isPending(): bool
+    + isActive(): bool
+    + isCompleted(): bool
+    + isCanceled(): bool
+
+    + cancel()
+}
+Flight *- FlightStatus: has
+Flight --> Aircraft: on
+Flight --> Crew: with
+Flight *-- WayPoint: between
+
+
+
+class Schedule {
+    - flights: Set<Flight>
+    - memberFlights: Map<CrewMember, Flight>
+    + search(filter): Flight[]
+    + getFlights(): Flight[]
+    + getMemberFlights(member: CrewMember): Flight[]
+}
+Schedule o-- Flight: manges
+Schedule ..> SearchFilter: search()
+
+class SearchFilter {
+    + departureAirport: Airport | null
+    + arrivalAirport: Airport | null
+    + departureDate: Date
+}
+
+enum UserStatus {
+    + Active
+    + Blocked
+}
+
+abstract User {
+    - status: UserStatus
+    - username: string
+    - password: string
+    + constructor(username, password)
+
+    + getUsername(): string
+    + getPassword(): string
+    + isValidPassword(password): bool
+    + resetPassword(oldPassword, newPassword)
+
+    + isActive(): bool
+    + block()
+    + unblock()
+}
+User *- UserStatus: has
+
+class Admin extends User {
+    + addAircraft(aircraft)
+    + removeAircraft(aircraft)
+
+    + addFlight(aircraft, crew, departure, arrival)
+    + cancelFlight(flight)
+
+    + blockUser(user)
+    + unblockUser(user)
+}
+
+class Wallet {
+    - money: int
+    + getMoneyAmount(): int
+    + addMoney(amount)
+    + subMoney(amount)
+}
+
+class Customer extends User {
+    - notifications: Notification[]
+    + getWallet(): Wallet
+
+    + notify(notification)
+    + getNotifications(): Notification[]
+
+    + makeReservation(flight, seats): Ticket
+    + cancelReservation(ticket)
+}
+Customer *-- Wallet: has
+Customer --> Notification: notify()
+
+class Authorization <<Factory, Repository>> {
+    - users: Map<string, User>
+    + registerAdmin(username, password)
+    + registerPilot(username, password)
+    + registerSteward(username, password)
+    + registerCustomer(username, password)
+
+    + login(username, password): User
+}
+Authorization *-- User: manages
+
+enum PaymentStatus {
+    + Pending
+    + Payed
+    + Refunded
+}
+
+class Payment {
+    - status: PaymentStatus
+    - amount: int
+    + constructor(amount)
+
+    + isPayed(): bool
+    + pay(amount)
+    + refund()
+}
+Payment *-- PaymentStatus: has
+
+class Reservation {
+    - customer: Customer
+    - flight: Flight
+    - seats: Seat[]
+    - payment: Payment
+    - canceled: bool
+
+    + constructor(customer, flight, seats, payment)
+
+    + getCustomer(): Customer
+    + getFlight(): Flight
+    + getSeats(): Seat[]
+
+    + getCost(): int
+    + cancel()
+    + isCanceled(): bool
+}
+Reservation -- Customer: for
+Reservation o-- Payment: confirmed by
+Reservation --> Flight: of
+Reservation --> Seat: of
+
+class Itinerary {
+    - reservations: Flight[]
+    + constructor(flights)
+    + getStartPoint()
+    + getEndPoint()
+    + getDuration() [startDateTime, endDateTime]
+}
+Itinerary --> Flight: consists of
+
+class ReservationsCatalog <<Factory, Repository>> {
+    - reservations: Reservation[]
+    + createReservation(customer, flight, seats)
+    + getReservations(): Reservation[]
+    + getCustomerReservations(customer): Reservation[]
+}
+ReservationsCatalog *-- Reservation: manages
+
+class Ticket {
+    - reservation: Reservation
+    + getReservation(): Reservation
+}
+Ticket o-- Reservation: confirmation of
+
+class Airline {
+    - auth: Authorization
+    - park: Park
+    - schedule: Schedule
+    + getAuth(): Authorization
+    + getPark(): Park
+    + getSchedule(): Schedule
+}
+Airline ..> Authorization: provides
+Airline ..> Park: provides
+Airline ..> Schedule: provides
+
+abstract Notification {
+    - receiver: Customer
+}
+
+abstract ReservationNotification extends Notification {
+    - reservation: Reservation
+    + constructor(reservation)
+
+    + getReservation(): Reservation
+}
+
+class ReservedNotification extends ReservationNotification {
+}
+
+class CanceledNotification extends ReservationNotification {
+}
+
+@enduml

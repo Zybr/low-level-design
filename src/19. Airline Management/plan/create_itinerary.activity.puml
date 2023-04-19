@@ -1,0 +1,20 @@
+@startuml
+start
+
+:Customer chooses an option to create itinerary?;
+
+if (Create online) then (Yes)
+    :Select the itinerary option;
+else (No)
+    :Go to the front desc officer;
+endif
+
+repeat
+:Select departure location;
+:Select destination location;
+repeat while (Add another flight?) is (Yes)
+
+:Book ticket;
+
+stop
+@enduml

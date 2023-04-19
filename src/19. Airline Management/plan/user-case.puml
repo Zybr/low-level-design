@@ -1,0 +1,36 @@
+@startuml
+left to right direction
+
+Customer --> (Search flights)
+Customer --> (View itinerary)
+Customer --> (Make payment)
+Customer --> (Create itinerary)
+    (Create itinerary) ..> (Create flight reservation): include
+        (Create flight reservation) ..> (Assign seat)
+    (Create itinerary) ..> (Add passenger)
+    (Create itinerary) ..> (New itinerary notification)
+Customer --> (Assign seat)
+Customer --> (Cancel reservation)
+    (Cancel reservation) ..> (Refund payment)
+    (Cancel reservation) ..> (Reservation cancel notification)
+Customer --> (Cancel itinerary)
+    (Cancel itinerary) ..> (Cancel reservation): include
+Customer --> (Login/logout/reset password)
+
+Customer <|-- FrontDescOfficer
+
+(Add/modify flight) <-- Admin
+(Add aircraft) <-- Admin
+(Assign crew) <-- Admin
+    (Modify flight instance) <.. (Assign crew): extends
+(Block/unblock user) <-- Admin
+(Cancel flight) <-- Admin
+    (Cancel reservation) <.. (Cancel flight): include
+
+(New itinerary notification) <-- System
+(Reservation cancel notification) <-- System
+(Flight status notification) <-- System
+
+Crew --> (View flight schedule)
+
+@enduml

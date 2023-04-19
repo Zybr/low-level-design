@@ -1,0 +1,92 @@
+Questions
+    Functions
+        What customers can do?
+            - book ticket
+                - source place
+                - destination place
+                - time
+                - place?
+                - class?
+            - cancel ticket
+                - pay back money
+    Search
+        How customers can search?
+            - by source/destination place
+            - by time
+            - by start date & time
+    Collision
+        How to solve simultaneous bookings?
+    Roles
+        Pilots
+            Can they have schedule based on flies?
+        Managers
+            What can managers do?
+            Does manager schedule flights?
+        Admins
+            What can admins do?
+            Does admin add/remove employees?
+        Which other tasks can be?
+
+Models
+    Address
+        - country
+        - state
+        - city
+        - streetAddress
+        - zipCode
+    Place
+        - isReserved
+    Airplane
+        - places[]
+    Airport
+        - address
+        - airplanes[]
+    Flight
+        - airplane
+        - pilots[]
+        - sourceAirport
+        - destinationAirport
+    Schedule
+        - flights[]
+    Payment
+        - amount
+        - isPayed
+    Reservation
+        - customer
+        - flight
+        - place
+        - cost
+        - payment
+    Roles
+        Customer
+            + search Flights()
+            + make/cancel Booking()
+        Pilot
+        Manager
+            + add/cancel Flight()
+        Admin
+            + add/cancel/block Employee/Customer
+Design
+    Singleton - System
+    Facade - Roles
+    Factory - Reservation/Flight creation
+    State - Reservation can have several states depending on time and cancellation
+
+--
+    Flight reservation
+        Can one user reserve several places or whole airplane?
+    Payment handling
+        Online/offline?
+        Cache/card?
+        Pay in advance / in time?
+    Price variance
+        Things which can effect price
+            - type/class
+            - weekday
+            - demand
+            - duration
+        Is it calculated automatically or set by manager?
+    Cancellation
+        Can be canceled?
+        Which time before can be canceled?
+        - Which type of user can cancel booking?
