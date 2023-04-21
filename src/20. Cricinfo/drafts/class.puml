@@ -1,0 +1,228 @@
+@startuml
+abstract User {
+    - username: string
+    - password: string
+    + constructor(username, password)
+
+    + isValidPassword(password): bool
+    + resetPassword(oldPassword, newPassword)
+}
+
+class Admin extends User {
+    + setStadium(match, stadium)
+    + setUmpire(match, umpire)
+    + addCommentator(match, commentator)
+
+    + addInning(match, inning)
+    + removeInning(match, inning)
+
+    + addOver(match, over)
+    + remove(match, over)
+
+    + addBall(match, ball: Ball)
+    + removeBall(match, ball: Ball)
+
+    + createNewsPiece(title, text)
+    + updateNewsPiece(news, title?, text?)
+}
+Admin ..> TournamentsCatalog: manages
+Admin ..> News: manages
+
+class Commentator extends User {
+    + addComment(match, text)
+}
+Commentator ..> CommentsHistory: addComment()
+
+class Auth <<Factory, Repository>>{
+    + createAdmin(username, password)
+    + createCommentator(username, password)
+
+    + login(): User
+}
+Auth *-- User: manages
+
+class Player {
+    - firstName: string
+    - lastName: string
+    + constructor(firstName, lastName)
+}
+
+class Squad {
+    - players: Set<Player>
+    + addPlayer(player)
+    + removePlayer(player)
+}
+Squad *-- Player: consist s of
+
+abstract Ball {
+}
+
+class WicketBall extends Ball {
+}
+
+class RunBall extends Ball {
+}
+
+class Inning {
+}
+class Over {
+}
+
+class Stadium {
+}
+
+class Umpire {
+}
+
+class MatchStatus {
+    - Pending
+    - Active
+    - Done
+}
+
+class MatchType {
+    + Test
+    + ODI
+    + T20
+}
+
+class Score {
+    - points: Map<Squad, int>
+    + increasePoints(Squad)
+    + getPoints() Map<Squad, int>
+}
+
+class Comment {
+    - commentator: Commentator
+    - text: string
+    + constructor(author: Commentator, text)
+
+    + getText(): string
+}
+Comment o-- Commentator: commented by
+
+class CommentsHistory <<Factory, Repository>> {
+    - comments: Comment[]
+    + createComment(author, text)
+    + getComments(): Comment[]
+}
+CommentsHistory *-- Comment: consists of
+
+class Match {
+    - type: MatchType
+    - status: MatchStatus
+    - tournament: Tournament
+    - stadium: Stadium | null
+    - umpire: Umpire | null
+    - commentators: Commentator[]
+    - history: CommentsHistory[]
+    - innings: Inning[]
+    - overs: Over[]
+    - squadA: Squad
+    - squadB: Squad
+    - balls: Ball[]
+    + constructor(tournament, type, squadA, squadB)
+
+    + setStadium(stadium)
+    + setUmpire(umpire)
+    + addCommentator(commentator)
+
+    + getInnings(): Inning[]
+    + addInning(inning)
+    + removeInning(inning)
+
+    + getOvers(): Over[]
+    + addOver(over)
+    + remove(over)
+
+    + getBalls(): Ball[]
+    + addBall(ball: Ball)
+    + removeBall(ball: Ball)
+
+    + getHistory(): CommentsHistory
+
+    + start()
+    + done()
+
+    + isPending(): bool
+    + isActive(): bool
+    + isDone(): bool
+}
+Match *-- MatchStatus: has
+Match *-- MatchType: has
+Match *-- Inning: has
+Match *-- Over: has
+Match "1" o-- "2" Squad: has
+Match *-- Ball: has
+Match *-- Score: has as result
+Match ..> Stadium: placed at
+Match ..> Umpire: controlled by
+Match ..> Commentator: commenting
+Match ..> CommentsHistory: has
+
+class SquadStatistics {
+    - squad: Squad
+    - points: int
+    - wins: int
+    - losses: int
+
+    + constructor(squad)
+
+    + addPoints(points)
+    + increaseWins()
+    + increaseLosses()
+}
+
+class Statistics <<Repository>> {
+    - squadsStatistics<Squad, SquadStatistics>
+    + addSquad(squad)
+    + getSquadStat(squad)
+}
+Statistics *-- SquadStatistics: manages
+
+class Tournament <<Repository>> {
+    - matches: Match[]
+    - statistics: Statistics
+    + addMatch(match)
+    + getStat(): Statistics
+
+    + isPending(): bool
+    + isActive(): bool
+    + isDone(): bool
+}
+Tournament *-- Match: includes
+Tournament *-- Statistics: has
+
+class TournamentsCatalog <<Factory, Repository>> {
+    - tournaments: Tournament[]
+    + createTournament(): Tournament
+    + getPendingTournaments(): Tournament[]
+    + getActiveTournaments(): Tournament[]
+}
+TournamentsCatalog o-- Tournament: manages
+
+class NewsPiece {
+    - title: string
+    - text: string
+    - createdAt: DateTime
+    - updateAt: DateTime
+    + constructor(title, text)
+
+    + setTitle(title)
+    + setText(text)
+
+    + getCreatedAt(): DateTime
+    + getUpdatedAt(): DateTime
+}
+
+class News <<Factory, Repository>> {
+    - pieces: NewsPiece[]
+    + createPiece(title, text): NewsPiece
+    + getPieces(): NewsPiece[]
+}
+News *-- NewsPiece: manages
+
+' Over, Inning, Ball
+' Player statistics, squad statistics
+
+@enduml

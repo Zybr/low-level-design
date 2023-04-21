@@ -1,0 +1,92 @@
+Questions
+    Search
+        Which parameters can be user for search
+            of matches (archived / streams)
+                - date period
+                - teams
+                - players
+                - place (country & state)
+            of teams
+                - date period
+                - name
+                - place
+            of players
+                - date period
+                - name
+                - place
+            of tournaments
+                - date period
+                - place
+                - team
+                - player
+                - place
+            of articles / of news
+                - key word
+                    - of title
+                    - of description
+                - date period
+            of scores
+                - type
+                - player
+                - team
+    Roles
+        Who add matches, news, articles?
+            - admin
+        Who comment streams?
+            - commentator
+        Which functions/access require registration?
+    Functions
+        Can user comment news/matches/tournaments/articles/scores?
+        Can user communicate with each other (direct messages)?
+
+Models
+    Match
+        Player
+            - name
+        Team
+            - players[]
+        Result
+            - winner
+            - score
+        Records
+            PlayerRecord
+                - type
+                - player
+            TeamRecord
+                - type
+                - team
+        Match
+            - teams
+            - date
+            - records[]
+        Commentator
+            - name
+        Stream
+            - match
+            - commentators[]
+        Tournament
+            - matches[]
+    Info
+        NewsPiece
+            - date
+            - title
+            - text
+            - ? category/tag
+        Article
+            - title
+            - text
+            - ? category/tag
+    Roles
+        Admin
+        Commentator
+        User
+
+Patterns
+    Singleton - System
+    Factory (factory method) - Generation of models (role, comments, news, articles, matches)
+    Repository - Catalogs of users/teams/players/matches
+    Builder - Search filter
+    Facade - User's ability
+
+---
+    Statistics

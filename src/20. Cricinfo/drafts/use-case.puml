@@ -1,0 +1,42 @@
+@startuml
+left to right direction
+
+User --> (See tournaments)
+    (See tournaments) <.. (See tournament statistics): extends
+User --> (See matches)
+    (See matches) <|-- (See archived match)
+    (See matches) <|-- (See streamed match)
+        (See streamed match) <.. (See match result): extends
+User --> (See teams)
+    (See teams) <.. (See team statistics): extends
+User --> (See players)
+    (See players) <.. (See player statistics): extends
+
+Player --> (Play match)
+    (Play match) <.. (Change score): extends
+        (Change score) ..> (Update player statistics): include
+        (Change score) ..> (Update team statistics): include
+        (Change score) ..> (Change match result): include
+    (Play match) ..> (Add commentary): include
+
+Player <|-- Capitan
+Capitan --> (Join tournament)
+    (Join tournament) ..> (Select players): include
+Capitan --> (Joint match)
+    (Joint match) ..> (Select players): include
+
+(Update player statistics) <-- System
+(Update team statistics) <-- System
+(Change score) <-- System
+(Add commentary) <-- System
+
+Admin --> (Create tournament)
+Admin --> (Create match)
+Admin --> (Create team)
+    (Create team) ..> (Add player): include
+Admin --> (Add player)
+Admin --> (Create news)
+
+
+
+@enduml
