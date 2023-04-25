@@ -1,0 +1,30 @@
+@startuml
+
+== Open job ==
+
+[o-> User++: openJob(company, position)
+    User -> System++: getJobsCatalog()
+    User <-- System--: JobsCatalog
+    User -> JobsCatalog++: addOpening(open, position)
+        JobsCatalog -> JobOpening**: create
+            JobsCatalog -> JobsCatalog: add opening
+    User <-- JobsCatalog--: JobOpening
+[o<-- User--: JobOpening
+
+== Apply for opening ==
+
+[o-> System++: getJobsCatalog()
+[o<-- System--: JobsCatalog
+[o-> JobsCatalog++: search()
+[o<-- JobsCatalog--: Jobs[]
+
+[o-> User++: applyJob(opening)
+    User -> JobOpening++: apply(user)
+    User--
+        JobOpening -> JobOpening: getEmployer()
+        JobOpening <-- JobOpening: Employer
+        JobOpening -> ApplyNotification**: create
+        JobOpening--
+            ApplyNotification++
+            ApplyNotification -> Employer--: notify()
+@enduml

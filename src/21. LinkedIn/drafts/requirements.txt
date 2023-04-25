@@ -1,0 +1,144 @@
+Models
+    User
+        - personalPage
+        - ? rating (calculated by "evaluation")
+        Profile
+            - educations
+            - skills
+            - achievements
+            - works
+            Period
+                - from
+                - to
+            Education
+                - period
+                - school/university
+                - degree
+            Course
+                - period
+                - name
+                - company
+            Skill
+                - name
+                - ? confirmation
+            Achievement
+                - name
+                - time
+            Work
+                - period
+                - company
+                - position
+    Admin
+        + blockUser()
+        + unblockUser()
+    Moderator
+        + changePage/Post/Comment()
+        + removePage/Post/Comment()
+    Group
+        - name
+        - description
+        - users
+    Invitation
+        - group
+        - sender
+        - receiver
+    Page
+        - text
+        - posts
+        PersonalPage
+            - posts
+            - comments
+        TopicPage
+            - title
+            - posts
+            - comments
+    Company
+        - name
+        Job
+            - company
+            - position
+            - description
+            - responsibilities
+            + apply(User)
+    Message
+        - text
+        - author
+        Post (of page)
+        Comment (of page, post)
+            Evaluation
+                - author: User
+                - type: Like | Dislike
+        DirectMessage
+            - receiver
+Patterns
+    Singleton - System
+    Factory (method) - create posts/comments/notifications/messages and etc
+    Observer - receiving notifications/messages
+    State - interaction with active/archived topics
+    Repository - catalog of topics/jobs/users/companies and etc
+
+Questions
+    Roles
+        Is there Guest role?
+        Is there Admin/Moderator role?
+            Which functions does it take?
+                - check/edit/remove posts/topics
+    What and how users can search
+        Users by
+            - name
+        Topics by
+            - title (keywords)
+            - text (keywords)
+            - author
+        ? Posts
+            - author
+            - text (keyword)
+    Functions
+        Job
+            What's the difference between (potential) employee account and company account?
+            Is there any special functions for account of Human Resources account?
+            How does a job advertisement look?
+            How does a job offer look?
+        Social
+            + Can users be joined into groups?
+                Is there some kind of invitation?
+            Can users have friends and fiend list?
+                Is there some kind of friends ship?
+            Should be implemented any confirmations of
+                - skill
+                - education
+                - experience
+            How do recommendations work?
+        Messages
+            + Can users sent direct messages?
+            + Can users create:
+                - posts
+                - comments
+        Rating
+            Can users likes/dislike
+                - topics
+                - posts
+                - comments
+                Should user have rating base on (dis)likes?
+        Access
+            Can users control access to:
+                their topics
+                private-pages
+                profile
+--
+    Search
+        - jobs
+        - profiles
+        - users by
+            - company
+            - employment history
+            - job type
+    Follow
+        Connection of pages
+    Groups/jobs
+        Can user post a job?
+        Can user join to a group?
+            Which are criteria of joining?
+    Alerts
+        How users control kinds of receiving notifications?
+

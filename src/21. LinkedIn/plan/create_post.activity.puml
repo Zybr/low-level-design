@@ -1,0 +1,30 @@
+@startuml
+
+:User selects "Create post" to compose a new post;
+:"Create post" pop-up opens;
+:User add text to the post;
+
+if (Upload media?) then (Yes)
+
+    repeat
+        :Choose media;
+
+        fork
+            :Photo;
+        fork again
+            :Video;
+        fork again
+            :Location;
+        fork end
+
+        :Upload media;
+
+    repeat while (Add additional media?) is (Yes)
+
+else (No)
+endif
+
+:User presses the "post" button;
+:Post is published;
+
+@enduml

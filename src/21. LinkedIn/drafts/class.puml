@@ -1,0 +1,456 @@
+@startuml
+
+class Period {
+    - start: DateTime
+    - end: DateTime
+    + constructor(start, end)
+
+    + getStart(): DateTime
+    + getEnd(): DateTime
+}
+
+class Education {
+    - period: Period
+    - school: string
+    - degree: string
+    + constructor(period, school, degree)
+
+    + getPeriod(): Period
+    + getSchool(): string
+    + getDegree(): string
+}
+Education o-- Period: has
+
+class Work {
+    - period: Period
+    - company: string
+    - position: string
+    + constructor(period, company, position)
+
+    + getPeriod(): Period
+    + getCompany(): string
+    + getPosition(): string
+}
+Work o-- Period: has
+
+class Achievement {
+    - name: string
+    - date: Date
+    + constructor(name, date)
+
+    + getName(): string
+    + getDate(): Date
+}
+
+class Recommendation {
+    - recommender: User
+    - worker: User
+    + constructor(recommender, worker)
+
+    + getRecommender(): User
+    + getWorker(): User
+}
+
+class Profile {
+    - user: User
+    - educations: Education[]
+    - works: Work[]
+    - achievements: Achievement[]
+    - recommendations: Set<User, Recommendation>
+
+    + getEducations(): Education[]
+    + addEducation(period, school, degree)
+
+    + getWorks(): Work[]
+    + addWork(period, company, position)
+
+    + getAchievements(): Achievement[]
+    + addAchievement(name, date)
+
+    + getRecommendations(): Recommendation[]
+    + addRecommendation(recommender)
+    + removeRecommendation(recommender)
+}
+Profile *-- Education: has education
+Profile *-- Work: has experience
+Profile *-- Achievement: has
+Profile *-- Recommendation: confirmed by
+
+class ConnectionsList {
+    - connections: Set<User>
+    + addConnection(user)
+    + removeConnection(user)
+}
+
+class FollowsList {
+    - topics: Set<Topic>
+    - users: Set<users>
+
+    + followTopic(topic)
+    + unfollowTopic(topic)
+
+    + followUser(user)
+    + unfollowUser(user)
+}
+
+enum UserStatus {
+    + Active
+    + Blocked
+}
+
+abstract BaseUser {
+    - username: string
+    - password: string
+    + constructor(username, password)
+
+    + isValidPassword(password): bool
+    + resetPassword(oldPassword, newPassword)
+
+    + block()
+    + unblock()
+}
+BaseUser *-- UserStatus: has
+
+class User <<Facade, Observer>>  extends BaseUser {
+    - profile: Profile
+    - connectionsList: ConnectionsList
+    - followsList: FollowsList
+    - notifications: Notification[]
+
+    + getProfile(): Profile
+    + getConnectionsList(): ConnectionsList
+    + getFollowsList(): FollowsList
+
+    + createTopic(title, text): Page
+    + removeTopic(page)
+
+    + createPost(page, text): Post
+    + editPost(post)
+    + removePost(post)
+
+    + createComment(message, text): Comment
+    + editComment(message, text)
+    + removeComment(message)
+
+    + connectUser(user): ConnectionInvitation
+    + disconnect(user)
+
+    + createGroup(name): Group
+    + removeGroup(group)
+    + inviteIntoGroup(group, user): GroupInvitation
+
+    + openJob(company, position): JobOpening
+    + applyJob(opening): JobOpening
+
+    + getNotifications(): Notification[]
+    + shareMessage(message, user)
+    + sendMessage(receiver, text)
+}
+User *-- Profile: has
+User *-- ConnectionsList: has
+User *-- PrivatePage: has
+User *-- FollowsList: has
+User ..> Notification: produces - share/sendMessage()
+
+class Admin extends BaseUser {
+    + blockUser(user)
+    + unblockUser(user)
+
+    + removePage(page)
+
+    + deleteGroup(page)
+}
+
+class Authorization {
+    - users: Map<string, User>
+    + createUser(username, password): User
+    + createAdmin(username, password): Admin
+
+    + login(username, password): BaseUser
+    + getUser(username): BaseUser
+}
+Authorization o-- User: manages
+
+abstract Message {
+    - author: User
+    - text: string
+    - createAt: DateTime
+    - updatedAt: DateTime
+    - reactions: Set<User, Reaction>
+
+    + constructor(author, text)
+
+    + getAuthor(): User
+
+    + getText(): string
+    + setText(text)
+
+    + getLikes(): int
+    + getDislikes(): int
+    + addReaction(author, type)
+    + removeReaction(author)
+}
+Message *-- Reaction: has
+
+class Post extends Message {
+    - comments: Comment[]
+
+    + addComment(author, message)
+}
+Post *-- Comment: has
+
+class Comment extends Message {
+}
+Comment ..> Notification: produces
+
+abstract Page {
+    - author: User
+    - title: string
+    - text: string
+    - posts: Post[]
+    - createAt: DateTime
+    - updatedAt: DateTime
+
+    + constructor(author, title, text)
+
+    + getAuthor(): User
+
+    + getTitle(): string
+    + setTitle(title)
+
+    + getText(): string
+    + setText(text)
+
+    + addPost(author, message): Post
+    + getPosts(): Post[]
+    + getAuthorPosts(author): Post[]
+}
+Page *-- Post: has
+
+class PrivatePage extends Page {
+}
+
+class Topic extends Page {
+}
+
+class TopicsFilter <<QueryObject>> {
+    - titleKeyword: string
+    - textKeyword: string
+
+    + setTitleKeyWord(titleKeyword)
+    + getTitleKeyWord(): string
+
+    + setTextKeyWord(titleKeyword)
+    + getTextKeyWord(): string
+}
+
+class TopicsCatalog <<Factory, Repository>> {
+    - topics: Set<Topic>
+
+    + searchTopics(filter)
+
+    + createTopic(author, title, text): Topic
+    + removeTopic(topic)
+}
+TopicsCatalog o-- Topic: manages
+TopicsCatalog ..> TopicsFilter: searchTopics()
+
+enum ReactionType {
+    + Like
+    + Dislike
+}
+
+class Reaction {
+    - type
+    + reaction(type)
+}
+Reaction *-- ReactionType: has
+
+class Group {
+    - name: string
+    - admin: User
+    - members: Set<User>
+    + constructor(admin, name)
+
+    + addMember(member)
+    + removeMember(member)
+}
+Group o-- User: consists of
+
+class GroupsFilter <<QueryObject>> {
+    - nameKeyword: string
+    - members: Set<User>
+
+    + getNameKeyword(): string
+    + setNameKeyword(nameKeyword)
+
+    + getMembers(): User[]
+    + setMembers(members[])
+}
+
+class GroupsCatalog <<Factory, Repository>> {
+    - groups: Set<Group>
+
+    + searchGroups(filter): Groups[]]
+    + createGroup(name): Group
+    + removeGroup(name)
+}
+GroupsCatalog o-- Group: manages
+GroupsCatalog ..> GroupsFilter: searchGroups()
+
+enum InvitationStatus {
+    + Pending
+    + Accepted
+    + Rejected
+    + Canceled
+}
+
+abstract Invitation {
+    - receiver: User
+    - status: InvitationStatus
+    + constructor(receiver)
+
+    + getReceiver(): User
+
+    + accept()
+    + reject()
+    + cancel()
+}
+Invitation *-- InvitationStatus: has
+
+class GroupInvitation extends Invitation {
+    - group: Group
+    + constructor(group, receiver)
+
+    + getGroup(): Group
+}
+GroupInvitation ..> Group: invite into
+GroupInvitation ..> Notification: produces
+
+class ConnectionInvitation extends Invitation {
+    - sender: User
+    + constructor(sender, receiver)
+
+    + getSender(): Sender
+}
+ConnectionInvitation ..> ConnectionsList: invite into
+ConnectionInvitation ..> Notification: produces
+
+class JobOpening {
+    - employer: User
+    - company: string
+    - position: position
+
+    + constructor(employer, company, position)
+
+    + getEmployer(): User
+    + getCompany(): string
+    + getPosition(): string
+    + apply(worker)
+}
+JobOpening ..> Notification: produces
+
+class JobsFilter <<QueryObject>> {
+    - company: string
+    - position: string
+
+    + getCompany(): string
+    + setCompany(company)
+
+    + getPosition(): string
+    + setPosition(position): string
+}
+
+class JobsCatalog<<Factory, Repository>> {
+    - openings: Set<JobOpening>
+
+    + search(filter): JobOpening[]
+
+    + addOpening(company, position)
+    + removeOpening(opening)
+}
+JobsCatalog o-- JobOpening: manages
+JobsCatalog ..> JobsFilter: search()
+
+abstract Notification {
+    - receiver: User
+
+    + constructor(receiver)
+
+    + getReceiver(): User
+}
+
+class InvitationNotification extends Notification {
+    - invitation: Invitation
+    + constructor(receiver, invitation)
+
+    + getInvitation(): Invitation
+}
+
+class ShareNotification extends Notification {
+    - sender: User
+    - message: Message
+    + constructor(receiver, sender, message)
+
+    + getSender(): User
+    + getMessage(): Message
+}
+
+class CommentNotification extends Notification {
+    - sender: User
+    - post: Post
+    - comment: Comment
+    + constructor(receiver, post, comment)
+
+    + getSender(): User
+    + getPost(): Post
+    + getComment(): Comment
+}
+
+class MessageNotification extends Notification {
+    - sender: User
+    - message: string
+    + constructor(receiver, sender, message)
+
+    + getSender(): User
+    + getMessage(): string
+}
+
+class ApplyNotification extends Notification {
+    - sender: User
+    - opening: JobOpening
+    + constructor(receiver, sender, opening)
+
+    + getSender(): User
+    + getOpening(): JobOpening
+}
+
+class Statistics {
+    - profileViews: Set<Profile, int>
+    - pagesViews: Set<Page, int>
+    - pageSearchView: Set<Page, int>
+
+    + incrementProfileView(profile)
+    + incrementPageView(page)
+    + incrementSearchView(page)
+}
+
+class System <<Singleton>> {
+    - auth: Authorization
+    - groupsCatalog: GroupsCatalog
+    - topicsCatalog: TopicsCatalog
+    - jobsCatalog: JobsCatalog
+    - statistics: Statistics
+
+    + getAuth(): Authorization
+    + getGroupsCatalog(): GroupsCatalog
+    + getTopicsCatalog(): TopicsCatalog
+    + getJobsCatalog(): JobsCatalog
+}
+System ..> Authorization: provides
+System ..> GroupsCatalog: provides
+System ..> TopicsCatalog: provides
+System ..> JobsCatalog: provides
+System ..> Statistics: provides
+
+@enduml

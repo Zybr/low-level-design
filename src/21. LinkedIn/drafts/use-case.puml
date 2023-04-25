@@ -1,0 +1,100 @@
+@startuml
+left to right direction
+
+User --> (Update profile)
+    (Update profile) <|-- (Update education info)
+    (Update profile) <|-- (Update experience info)
+    (Update profile) <|-- (Update achievements)
+    (Update profile) <|-- (Update skills)
+
+User --> (Search)
+    (Search) <|-- (Search pages)
+        (Search pages) <|-- (? Search pages by keyword)
+        (Search pages) <.. (See page): extends
+            (See page) ..> (Update number of page views)
+                (Update number of page views) <|-- (Update statistics)
+        (Search pages) ..> (Update number of page views in search): include
+                (Update number of page views in search) <|-- (Update statistics)
+    (Search) <|-- (Search groups)
+        (Search groups) <|-- (? Search groups by name)
+        (Search groups) <.. (See group): extends
+    (Search) <|-- (Search users)
+        (Search users) <.. (See user profile): extends
+        (Search users) <|-- (? Search users by username)
+            (See user profile) ..> (Update number of profile views): include
+                (Update number of profile views) <|-- (Update statistics)
+    (Search) <|-- (Search jobs)
+        (Search jobs) ..> (Search jobs by profession)
+
+User --> (Send connection request) #red
+    (Send connection request) ..> (Send connection notification): include
+        (Send connection notification) --|> (Send notification)
+    (Send connection request) <.. (Accept connection request): extends
+User --> (Cancel connection request) #red
+User --> (Accept connection request) #red
+    (Accept connection request) ..> (Update connections list): include
+User --> (Ignore connection request) #red
+User --> (See statistics)
+    (See statistics) <.. (See number of connections): extends
+    (See statistics) <.. (See number of profile views): extends
+    (See statistics) <.. (See number of page views in search): extends
+    (See statistics) <.. (See number of page views): extends
+
+User --> (Follow)
+    (Follow) <|-- (Follow user)
+        (Follow user) ..> (Update following list): include
+    (Follow) <|-- (Follow company page)
+        (Follow company page) ..> (Update following list): include
+
+User --> (Request recommendation) #orange
+    (Request recommendation) <.. (Give recommendation) #orange: extends
+        (Give recommendation) ..> (Update list of recommendations): include
+User --> (Give recommendation) #orange
+User --> (Remove recommendation) #orange
+    (Remove recommendation) ..> (Update list of recommendations): include
+
+User --> (Create/update/delete post) #green
+User --> (React on post/comment) #green
+    (React on post/comment) <|-- (Like)
+    (React on post/comment) <|-- (Dislike)
+User --> (Share post) #green
+    (Share post) ..> (Choose receiver): include
+        (Choose receiver) ..> (Send share notification): include
+            (Send share notification) <|-- (Send notification)
+User --> (Make a comment) #green
+    (Make a comment) <|-- (Comment of post)
+        (Comment of post) ..> (Send comment notification): include
+            (Send comment notification) --|> (Send notification)
+    (Make a comment) <|-- (Comment of comment)
+
+User --> (Send message) #pink
+    (Send message) ..> (Send message notification): include
+        (Send message notification) --|> (Send notification)
+    (Send message) ..> (Receive message): include
+User --> (Receive message) #pink
+
+User --> (Create company page)
+    (Create company page) <.. (Create job opening): extends
+User --> (Create job opening) #lime
+    (Create job opening) ..> (set job profession): include
+User --> (Apply for job) #lime
+    (Apply for job) ..> (? Send apply notification): include
+        (? Send apply notification) --|> (Send notification)
+
+User --> (Create group) #violet
+User --> (Join group) #violet
+
+User --> (See feed)
+note right of (See feed): Feed is based on \n - connections list \n - following list
+
+(Enable/disable page) <-- "Page/Group Admin" #violet
+(Delete group) <-- "Page/Group Admin" #violet
+(Block/unblock user) <-- "Page/Group Admin" #violet
+
+(Update connections list) <-- System
+(Update following list) <-- System
+(Update statistics) <-- System
+(Update list of recommendations) <-- System
+(Send notification) <-- System
+
+@enduml

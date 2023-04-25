@@ -1,0 +1,35 @@
+@startuml
+== Create topic ==
+
+[o-> User++: createTopic(title, text)
+    User -> System++: getTopicsCatalog()
+    User <-- System--: TopicsCatalog
+    User -> TopicsCatalog++: createTopic(user, title, text)
+        TopicsCatalog -> Topic**: create
+        TopicsCatalog -> TopicsCatalog: add topic
+    User <-- TopicsCatalog--: Topic
+[o<--User--: Topic
+
+== Create post ==
+
+[o-> User++: createPost(topic, text)
+    User -> Topic++: addPost(user, text)
+        Topic -> Post**: create
+        Topic -> Topic: addPost
+    User <-- Topic--: Post
+[o<--User--: Post
+
+== Comment post ==
+[o-> User++: createComment(post, text)
+    User -> Post++: addComment(user, text)
+        Post -> Comment**: create
+        Post -> Post: add comment
+        Post -> Post: getAuthor()
+        Post <-- Post: Author
+        Post -> CommentNotification**: create
+            CommentNotification++
+            CommentNotification -> Author--: notify()
+    User <-- Post--: Comment
+[o<--User--: Comment
+
+@enduml

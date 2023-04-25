@@ -1,0 +1,41 @@
+@startuml
+
+== Create group ==
+
+[o-> User++: createGroup(name)
+    User -> System++: getGroupsCatalog()
+    User <-- System--: GroupsCatalog
+        User -> GroupsCatalog++: createGroup(name)
+            GroupsCatalog -> Group**: create
+        User <-- GroupsCatalog--: Group
+[o<-- User--: Group
+
+== Invite member ==
+
+[o-> User++: inviteIntoGroup(receiver)
+    User -> GroupInvitation**: create
+    User--
+        GroupInvitation++
+        GroupInvitation -> GroupInvitation: status = **Pending**
+        GroupInvitation -> InvitationNotification**: create
+        GroupInvitation--
+            InvitationNotification++
+            InvitationNotification -> Receiver++: notify()
+            InvitationNotification--
+        Receiver -> InvitationNotification++: getInvitation()
+        Receiver <-- InvitationNotification--: Invitation
+    alt accept
+        Receiver -> Invitation++: accept()
+        Receiver--
+        Invitation -> Group++: addMember(receiver)
+        Invitation -> Invitation--: status = **Accepted**
+        Group--
+    else reject
+        Receiver -> Invitation++: reject()
+        Receiver++
+        Receiver--
+        Invitation -> Invitation--: status = **Rejected**
+        Group--
+    end
+
+@enduml

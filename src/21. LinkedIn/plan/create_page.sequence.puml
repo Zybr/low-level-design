@@ -1,0 +1,22 @@
+@startuml
+
+:1. User clicks the "Work" button;
+:2. User clicks on the \n"Create a Company Page" button;
+:3. Chose page type;
+
+fork
+    :4. Company;
+fork again
+    :5. Educational Institution;
+fork again
+    :6. Showcase Page;
+fork end
+
+repeat
+    :7. Add required fields;
+    :8. User presses the "Create Page" button;
+repeat while (9. Any required field missing) is (Yes)
+
+:10. Page created successfully;
+
+@enduml
